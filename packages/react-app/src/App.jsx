@@ -314,17 +314,17 @@ function App(props) {
       */
 
       //setWalletModalData({payload:payload,connector: connector})
-      let result = "";
-//adding from multisig
-      if (payload.method === 'eth_sendTransaction') {
-        confirm({
-            width: "90%",
-            size: "large",
-            title: 'Create Transaction?',
-            icon: <SendOutlined/>,
-            content: <pre>{payload && JSON.stringify(payload.params, null, 2)}</pre>,
-            onOk:async ()=>{
 
+      confirm({
+          width: "90%",
+          size: "large",
+          title: 'Send Transaction?',
+          icon: <SendOutlined/>,
+          content: <pre>{payload && JSON.stringify(payload.params, null, 2)}</pre>,
+          onOk:async ()=>{
+            let result;
+
+            if (payload.method === 'eth_sendTransaction') {
               try {
                 let signer = userProvider.getSigner();
 
@@ -344,70 +344,44 @@ function App(props) {
 
                 result = await signer.sendTransaction(params);
 
-                const transactionManager = new TransactionManager(userProvider, signer, true);
-                transactionManager.setTransactionResponse(result);
-
-                complete();
+                //const transactionManager = new TransactionManager(userProvider, signer, true);
+                //transactionManager.setTransactionResponse(result);
               }
               catch (error) {
                 // Fallback to original code without the speed up option
                 console.error("Coudn't create transaction which can be speed up", error);
-                result = await userProvider.send(payload.method, payload.params);
-                complete();
+                result = await userProvider.send(payload.method, payload.params)
               }
-
-            },
-            onCancel: ()=>{
-              console.log('Cancel');
-            },
-          });
-        }
-        else if (payload.method === 'eth_signTypedData_v4') {
-          const payloadParams = JSON.parse(payload.params[1]);
-          if (payloadParams.primaryType === "Permit") {
-            const tokenContract = payloadParams.domain.verifyingContract;
-            const spenderAddress = payloadParams.message.spender;
-            const tokenAmount = payloadParams.message.value;
-            const calldata = iface.encodeFunctionData("approve", [ spenderAddress, tokenAmount ]);
-            //let calldata = "0x095ea7b3000000000000000000000000" + spenderAddress.slice(2) + "000000000000000000000000000000000000000000000000" + tokenAmount.slice(2);
-
-            console.log("calldata:", calldata)
-            confirm({
-                width: "90%",
-                size: "large",
-                title: 'Approve Token Spend',
-                icon: <SendOutlined/>,
-                content: <pre>{payloadParams && JSON.stringify(payloadParams.domain, null, 2) + JSON.stringify(payloadParams.message, null, 2)}</pre>,
-                onOk:async ()=>{
-                  result = calldata;
+            } else if (payload.method === 'eth_signTypedData_v4') {
+              try {
+                const payloadParams = JSON.parse(payload.params[1]);
+                if (payloadParams.primaryType === "Permit") {
+                  const tokenContract = payloadParams.domain.verifyingContract;
+                  const spenderAddress = payloadParams.message.spender;
+                  const tokenAmount = payloadParams.message.value;
+                  const calldata = iface.encodeFunctionData("approve", [ spenderAddress, tokenAmount ]);
+                  //let calldata = "0x095ea7b3000000000000000000000000" + spenderAddress.slice(2) + "000000000000000000000000000000000000000000000000" + tokenAmount.slice(2);
+                  console.log("calldata:", calldata)
                   setData(calldata)
                   setTo(tokenContract)
-                  setTimeout(()=>{
-                    // what to do here? history.push('/create')
-                  },777);
-                },
-                onCancel: ()=>{
-                  console.log('Cancel');
-                },
-              });
-          }
-          else console.log("signTypedData payloads only work for token approvals");
-        } else {
-          confirm({
-            width: "90%",
-            size: "large",
-            title: 'Send Transaction?',
-            icon: <SendOutlined/>,
-            content: <pre>{payload && JSON.stringify(payload.params, null, 2)}</pre>,
-            onOk:async ()=>{
-                result = await userProvider.send(payload.method, payload.params);
-                complete();
-              },
-            onCancel: ()=>{
-              console.log('Cancel');
-            },
-          });
-        }
+                  //what goes here??? result = something.
+                } else {
+                  console.log("signTypedData payloads only work for token approvals");
+                  result = await userProvider.send(payload.method, payload.params);
+                }
+                console.log('result1', result);
+              }
+              catch (error) {
+                // Fallback to original code without the speed up option
+                console.error("Coudn't create transaction which can be speed up", error);
+                result = await userProvider.send(payload.method, payload.params)
+              }
+            }
+            else {
+              console.log("wtf")
+              result = await userProvider.send(payload.method, payload.params);
+            }
+
             //console.log("MSG:",ethers.utils.toUtf8Bytes(msg).toString())
 
             //console.log("payload.params[0]:",payload.params[1])
@@ -415,21 +389,24 @@ function App(props) {
 
             //let userSigner = userProvider.getSigner()
             //let result = await userSigner.signMessage(msg)
-        const complete = () => {console.log("RESULT:",result)
-
-          connector.approveRequest({
-            id: payload.id,
-            result: result.hash ? result.hash : result
-          });
-
-          notification.info({
-            message: "Wallet Connect Transaction Sent",
-            description: result.hash ? result.hash : result,
-            placement: "bottomRight",
-          });
-        }
+            console.log("RESULT:",result)
 
 
+            connector.approveRequest({
+              id: payload.id,
+              result: result.hash ? result.hash : result
+            });
+
+            notification.info({
+              message: "Wallet Connect Transaction Sent",
+              description: result.hash ? result.hash : result,
+              placement: "bottomRight",
+            });
+          },
+          onCancel: ()=>{
+            console.log('Cancel');
+          },
+        });
       //setIsWalletModalVisible(true)
       //if(payload.method == "personal_sign"){
       //  console.log("SIGNING A MESSAGE!!!")
