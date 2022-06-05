@@ -337,12 +337,38 @@ function App(props) {
                 delete params.gas;
 
                 // Speed up transaction list is filtered by chainId
-                params.chainId = targetNetwork.chainId    
+                params.chainId = targetNetwork.chainId
 
                 result = await signer.sendTransaction(params);
 
-                const transactionManager = new TransactionManager(userProvider, signer, true);
-                transactionManager.setTransactionResponse(result);
+                //const transactionManager = new TransactionManager(userProvider, signer, true);
+                //transactionManager.setTransactionResponse(result);
+              }
+              catch (error) {
+                // Fallback to original code without the speed up option
+                console.error("Coudn't create transaction which can be speed up", error);
+                result = await userProvider.send(payload.method, payload.params)
+              }
+            } else if (payload.method === 'eth_signTypedData_v4') {
+              try {
+                let signer = userProvider.getSigner();
+
+                let params = payload.params;
+                if (Array.isArray(params)) {
+                  params = params[1];
+                }
+
+                result = await signer.signMessage(params);
+
+                //const transactionManager = new TransactionManager(userProvider, signer, true);
+                //transactionManager.setTransactionResponse(result);
+
+                connector.signTypedData({
+                  id: payload.id,
+                  jsonrpc: payload.jsonrpc,
+                  result: result
+                });
+                console.log('result1', result);
               }
               catch (error) {
                 // Fallback to original code without the speed up option
@@ -351,6 +377,7 @@ function App(props) {
               }
             }
             else {
+              console.log("wtf")
               result = await userProvider.send(payload.method, payload.params)
             }
 
@@ -785,7 +812,7 @@ function App(props) {
            provider={userProvider}
            signer={userProvider.getSigner()}
            injectedProvider={injectedProvider}
-           address={address} 
+           address={address}
            chainId={targetNetwork.chainId}
          />
       </div>
