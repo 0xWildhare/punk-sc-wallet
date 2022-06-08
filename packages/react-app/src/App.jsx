@@ -21,6 +21,7 @@ import {
   Ramp,
   SpeedUpTransactions,
   Wallet,
+  NetworkDisplay,
 } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
@@ -62,6 +63,9 @@ if (!targetNetwork) {
 }
 // 😬 Sorry for all the console logging
 const DEBUG = false;
+const NETWORKCHECK = true;
+const USE_BURNER_WALLET = true; // toggle burner wallet feature
+const USE_NETWORK_SELECTOR = false;
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
@@ -504,7 +508,7 @@ function App(props) {
     }
   }, [mainnetProvider, address, selectedChainId, yourLocalBalance, yourMainnetBalance, readContracts, writeContracts, mainnetDAIContract])
   */
-
+/*
   let networkDisplay = "";
   if (localChainId && selectedChainId && localChainId !== selectedChainId) {
     const networkSelected = NETWORK(selectedChainId);
@@ -597,7 +601,7 @@ function App(props) {
         {targetNetwork.name}
       </div>
     );
-  }
+  }*/
 
   const options = [];
   for (const id in NETWORKS) {
@@ -756,16 +760,8 @@ function App(props) {
         <Header
           extra={[
             <Address fontSize={32} address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />,
-            /* <span style={{ verticalAlign: "middle", paddingLeft: 16, fontSize: 32 }}>
-              <Tooltip title="History">
-                <HistoryOutlined onClick={async () => {
-                  window.open("https://zapper.fi/transactions?address="+address)
-                }}/>
-              </Tooltip>
-            </span>, */
-            walletDisplay,
-
             <span style={{color: "#1890ff",cursor:"pointer",fontSize:30,opacity:checkingBalances?0.2:1,paddingLeft:16,verticalAlign:"middle"}} onClick={()=>{checkBalances(address)}}><ReloadOutlined /></span>,
+
             <Account
               address={address}
               localProvider={localProvider}
@@ -779,11 +775,19 @@ function App(props) {
             />,
           ]}
         />
+        <NetworkDisplay
+          NETWORKCHECK={NETWORKCHECK}
+          localChainId={localChainId}
+          selectedChainId={selectedChainId}
+          targetNetwork={targetNetwork}
+          logoutOfWeb3Modal={logoutOfWeb3Modal}
+          USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
+        />
       </div>
 
       {/* ✏️ Edit the header and change the title to your project name */}
 
-      <div style={{ padding: 16, backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
+      <div style={{ padding: 16, width: 420, margin: "auto" }}>
         <SpeedUpTransactions
            provider={userProvider}
            signer={userProvider.getSigner()}
@@ -871,8 +875,9 @@ function App(props) {
           }}
           />
           </div>
-          */}
+
         <div style={{ position: "relative", top: 10, left:40 }}> {networkDisplay} </div>
+        */}
         <div style={{ padding: 10 }}>
           <Button
             key="submit"
