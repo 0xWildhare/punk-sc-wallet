@@ -344,40 +344,15 @@ function App(props) {
 
                 result = await signer.sendTransaction(params);
 
-                //const transactionManager = new TransactionManager(userProvider, signer, true);
-                //transactionManager.setTransactionResponse(result);
+                const transactionManager = new TransactionManager(userProvider, signer, true);
+                transactionManager.setTransactionResponse(result);
               }
               catch (error) {
                 // Fallback to original code without the speed up option
                 console.error("Coudn't create transaction which can be speed up", error);
                 result = await userProvider.send(payload.method, payload.params)
               }
-            } else if (payload.method === 'eth_signTypedData_v4') {
-              try {
-                const payloadParams = JSON.parse(payload.params[1]);
-                if (payloadParams.primaryType === "Permit") {
-                  const tokenContract = payloadParams.domain.verifyingContract;
-                  const spenderAddress = payloadParams.message.spender;
-                  const tokenAmount = payloadParams.message.value;
-                  const calldata = iface.encodeFunctionData("approve", [ spenderAddress, tokenAmount ]);
-                  //let calldata = "0x095ea7b3000000000000000000000000" + spenderAddress.slice(2) + "000000000000000000000000000000000000000000000000" + tokenAmount.slice(2);
-                  console.log("calldata:", calldata)
-                  setData(calldata)
-                  setTo(tokenContract)
-                  //what goes here??? result = something.
-                } else {
-                  console.log("signTypedData payloads only work for token approvals");
-                  result = await userProvider.send(payload.method, payload.params);
-                }
-                console.log('result1', result);
-              }
-              catch (error) {
-                // Fallback to original code without the speed up option
-                console.error("Coudn't create transaction which can be speed up", error);
-                result = await userProvider.send(payload.method, payload.params)
-              }
-            }
-            else {
+            } else {
               console.log("wtf")
               result = await userProvider.send(payload.method, payload.params);
             }
