@@ -4,7 +4,16 @@ import { formatEther, parseEther } from "@ethersproject/units";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { Alert, Button, Col, Row, Select, Input, Modal, notification } from "antd";
 import "antd/dist/antd.css";
-import { useUserAddress } from "eth-hooks";
+import {
+  useBalance,
+  useContractLoader,
+  useContractReader,
+  useGasPrice,
+  useOnBlock,
+  useUserProviderAndSigner,
+  useUserAddress
+} from "eth-hooks";
+import { useEventListener } from "eth-hooks/events/";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import Web3Modal from "web3modal";
 import "./App.css";
@@ -22,11 +31,16 @@ import {
   SpeedUpTransactions,
   Wallet,
   NetworkDisplay,
+  CreateScWalletModal,
+  CreateModalSentOverlay,
 } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
-import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
+import { useExchangePrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
 import ERC20 from "./contracts/ERC20.json";
+import scWallet2 from "./contracts/scWallet2.json";
+import deployedContracts from "./contracts/hardhat_contracts.json";
+import externalContracts from "./contracts/external_contracts";
 import WalletConnect from "@walletconnect/client";
 
 import { TransactionManager } from "./helpers/TransactionManager";
@@ -35,7 +49,10 @@ const { confirm } = Modal;
 
 const { ethers } = require("ethers");
 
-let iface = new ethers.utils.Interface(ERC20.abi);
+const { Option } = Select;
+
+const iface = new ethers.utils.Interface(ERC20.abi);
+const scWalletABI = scWallet2.abi;
 /*
     Welcome to 🏗 scaffold-eth !
 
@@ -178,6 +195,7 @@ function App(props) {
   const mainnetProvider = scaffoldEthProvider //scaffoldEthProvider && scaffoldEthProvider._network ?  : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
+  const [address, setAddress] = useState();
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -207,22 +225,56 @@ function App(props) {
   const gasPrice = useGasPrice(targetNetwork, "fast");
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProvider = useUserProvider(injectedProvider, localProvider);
-  const address = useUserAddress(userProvider);
+  //const address = useUserAddress(userProvider);
 
   // You can warn the user if you would like them to be on a specific network
   const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
-  const selectedChainId = userProvider && userProvider._network && userProvider._network.chainId;
+  //const selectedChainId = userProvider && userProvider._network && userProvider._network.chainId;
 
   // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
   // The transactor wraps transactions and provides notificiations
-  const tx = Transactor(userProvider, gasPrice, undefined, injectedProvider);
+  const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider, USE_BURNER_WALLET);
+  const userSigner = userProviderAndSigner.signer;
 
-  // Faucet Tx can be used to send funds from the faucet
-  const faucetTx = Transactor(localProvider, gasPrice);
+  useEffect(() => {
+    async function getAddress() {
+      if (userSigner) {
+        const newAddress = await userSigner.getAddress();
+        setAddress(newAddress);
+      }
+    }
+    getAddress();
+  }, [userSigner]);
+
+  // You can warn the user if you would like them to be on a specific network
+
+  const selectedChainId =
+    userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
+
+  // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
+
+  // The transactor wraps transactions and provides notificiations
+  const tx = Transactor(userSigner, gasPrice);
 
   // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
   const yourLocalBalance = useBalance(localProvider, address);
+
+  // Just plug in different 🛰 providers to get your balance on different chains:
+  const yourMainnetBalance = useBalance(mainnetProvider, address);
+
+  const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
+
+  // Load in your local 📝 contract and read a value from it:
+  const readContracts = useContractLoader(localProvider, contractConfig);
+  if (DEBUG) console.log("readContracts: ", readContracts)
+
+  // If you want to make 🔐 write transactions to your contracts, use the userSigner:
+  const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
+
+
+  // Faucet Tx can be used to send funds from the faucet
+  const faucetTx = Transactor(localProvider, gasPrice);
 
   const balance = yourLocalBalance && formatEther(yourLocalBalance);
 
@@ -482,7 +534,7 @@ function App(props) {
 */
 
   // Just plug in different 🛰 providers to get your balance on different chains:
-  const yourMainnetBalance = useBalance(mainnetProvider, address);
+
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -713,39 +765,90 @@ function App(props) {
   const [depositing, setDepositing] = useState();
   const [depositAmount, setDepositAmount] = useState();
 
-/*
-  const handleOk = async () => {
-    setIsWalletModalVisible(false);
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
 
-    let result = await userProvider.send(walletModalData.payload.method, walletModalData.payload.params)
+  const contractName = "ScWallet";
+  const contractAddress = readContracts?.ScWallet?.address;
 
-    //console.log("MSG:",ethers.utils.toUtf8Bytes(msg).toString())
+  //📟 Listen for broadcast events
 
-    //console.log("payload.params[0]:",payload.params[1])
-    //console.log("address:",address)
+  // ScWalletFactory Events:    Listens for a new sc wallet
+  const ownersScWalletEvents = useEventListener(readContracts, "ScWalletFactory", "Owners", localProvider, 1);
+  if(DEBUG) console.log("📟 ownersScWalletEvents:", ownersScWalletEvents);
 
-    //let userSigner = userProvider.getSigner()
-    //let result = await userSigner.signMessage(msg)
-    console.log("RESULT:",result)
+  const [scWallets, setScWallets] = useState([]);
+  const [currentScWalletAddress, setCurrentScWalletAddress] = useState();
+
+  useEffect(() => {
+    if (address) {
+      const scWalletsForUser = ownersScWalletEvents.reduce((filtered, createEvent) => {
+        if (createEvent.args.owners.includes(address) && !filtered.includes(createEvent.args.contractAddress)) {
+          filtered.push(createEvent.args.contractAddress);
+        }
+
+        return filtered;
+      }, []);
+
+      if (scWalletsForUser.length > 0) {
+        const recentScWalletAddress = scWalletsForUser[scWalletsForUser.length - 1];
+        if (recentScWalletAddress !== currentScWalletAddress) setContractNameForEvent(null);
+        setCurrentScWalletAddress(recentScWalletAddress);
+        setScWallets(scWalletsForUser);
+      }
+    }
+  }, [ownersScWalletEvents, address]);
 
 
-    walletModalData.connector.approveRequest({
-      id: walletModalData.payload.id,
-      result: result
-    });
+  const [signaturesRequired, setSignaturesRequired] = useState(0);
+  const [nonce, setNonce] = useState(0);
 
-    notification.info({
-      message: "Wallet Connect Transaction Sent",
-      description: result.hash,
-      placement: "bottomRight",
-    });
-  };
+  const signaturesRequiredContract = useContractReader(readContracts, contractName, "signaturesRequired");
+  const nonceContract = useContractReader(readContracts, contractName, "nonce");
 
-  const handleCancel = () => {
-    setIsWalletModalVisible(false);
-  };
+  useEffect(() => {
+    setSignaturesRequired(signaturesRequiredContract);
+    setNonce(nonceContract);
+  }, [signaturesRequiredContract, nonceContract]);
 
-*/
+  const [contractNameForEvent, setContractNameForEvent] = useState();
+
+  useEffect(() => {
+    async function getContractValues() {
+      const signaturesRequired = await readContracts.ScWallet.signaturesRequired();
+      setSignaturesRequired(signaturesRequired);
+
+      const nonce = await readContracts.ScWallet.nonce();
+      setNonce(nonce);
+    }
+
+    if (currentScWalletAddress) {
+      readContracts.ScWallet = new ethers.Contract(currentScWalletAddress, scWalletABI, localProvider);
+      writeContracts.ScWallet = new ethers.Contract(currentScWalletAddress, scWalletABI, userSigner);
+
+      setContractNameForEvent("ScWallet");
+      getContractValues();
+    }
+  }, [currentScWalletAddress, readContracts, writeContracts]);
+
+  // ScWallet Events:
+  const allExecuteTransactionEvents = useEventListener(currentScWalletAddress ? readContracts : null, contractNameForEvent, "ExecuteTransaction", localProvider, 1);
+  if(DEBUG) console.log("📟 executeTransactionEvents:", allExecuteTransactionEvents);
+
+  const allOwnerEvents = useEventListener(currentScWalletAddress ? readContracts : null, contractNameForEvent, "Owner", localProvider, 1);
+  if(DEBUG) console.log("📟 ownerEvents:", allOwnerEvents);
+
+
+  const [ownerEvents, setOwnerEvents] = useState();
+  const [executeTransactionEvents, setExecuteTransactionEvents] = useState();
+
+
+  useEffect(() => {
+    setExecuteTransactionEvents(allExecuteTransactionEvents.filter( contractEvent => contractEvent.address === currentScWalletAddress));
+    setOwnerEvents(allOwnerEvents.filter( contractEvent => contractEvent.address === currentScWalletAddress));
+    //setDepositEvents(allDepositEvents.filter( contractEvent => contractEvent.address === currentScWalletAddress));
+
+  }, [allExecuteTransactionEvents, allOwnerEvents, currentScWalletAddress]);  // , allDepositEvents
+
 
   const walletDisplay =
     web3Modal && web3Modal.cachedProvider ? (
@@ -754,39 +857,45 @@ function App(props) {
       <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} />
     );
 
+  const handleScWalletChange = (value) => {
+    setContractNameForEvent(null);
+    setCurrentScWalletAddress(value);
+  }
+
   return (
     <div className="App">
-      <div className="site-page-header-ghost-wrapper">
-        <Header
-          extra={[
-            <Address fontSize={32} address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />,
-            <span style={{color: "#1890ff",cursor:"pointer",fontSize:30,opacity:checkingBalances?0.2:1,paddingLeft:16,verticalAlign:"middle"}} onClick={()=>{checkBalances(address)}}><ReloadOutlined /></span>,
 
-            <Account
-              address={address}
-              localProvider={localProvider}
-              userProvider={userProvider}
-              mainnetProvider={mainnetProvider}
-              price={price}
-              web3Modal={web3Modal}
-              loadWeb3Modal={loadWeb3Modal}
-              logoutOfWeb3Modal={logoutOfWeb3Modal}
-              blockExplorer={blockExplorer}
-            />,
-          ]}
-        />
-        <NetworkDisplay
-          NETWORKCHECK={NETWORKCHECK}
-          localChainId={localChainId}
-          selectedChainId={selectedChainId}
-          targetNetwork={targetNetwork}
-          logoutOfWeb3Modal={logoutOfWeb3Modal}
-          USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
-        />
-      </div>
-
+      <Header />
+      <NetworkDisplay
+        NETWORKCHECK={NETWORKCHECK}
+        localChainId={localChainId}
+        selectedChainId={selectedChainId}
+        targetNetwork={targetNetwork}
+        logoutOfWeb3Modal={logoutOfWeb3Modal}
+        USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
+      />
       {/* ✏️ Edit the header and change the title to your project name */}
-
+      <div style={{ position: "relative" }}>
+        <div style={{ position: "absolute", left: 20 }}>
+          <CreateScWalletModal
+            price={price}
+            selectedChainId={selectedChainId}
+            mainnetProvider={mainnetProvider}
+            address={address}
+            tx={tx}
+            writeContracts={writeContracts}
+            readContracts={readContracts}
+            contractName={'ScWalletFactory'}
+            isCreateModalVisible={isCreateModalVisible}
+            setIsCreateModalVisible={setIsCreateModalVisible}
+          />
+          <Select value={[currentScWalletAddress]} style={{ width: 120 }} onChange={handleScWalletChange}>
+            {scWallets.map((address, index) => (
+              <Option key={index} value={address}>{address}</Option>
+            ))}
+          </Select>
+        </div>
+      </div>
       <div style={{ padding: 16, width: 420, margin: "auto" }}>
         <SpeedUpTransactions
            provider={userProvider}

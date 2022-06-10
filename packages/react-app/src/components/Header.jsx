@@ -3,21 +3,21 @@ import React from "react";
 
 // displays a page header
 
-export default function Header( props ) {
+export default function Header({link, title, subTitle}) {
   return (
-
+    <a href={link} target="_blank" rel="noopener noreferrer">
       <PageHeader
-        title={(
-          <a href="https://punkwallet.io" >
-            {window.innerWidth<600?"🧑‍🎤":"🧑‍🎤  PunkWallet.io"}
-          </a>
-        )}
-        subTitle=<a href="https://github.com/scaffold-eth/scaffold-eth/tree/punk-wallet">
-          {window.innerWidth<600?"":"info/code"}
-        </a>
-        style={{ cursor: "pointer",fontSize:32 }}
-        extra={props.extra}
+        title={title}
+        subTitle={subTitle}
+        style={{ cursor: "pointer" }}
       />
-
+    </a>
   );
+}
+
+
+Header.defaultProps = {
+  link: "https://github.com/austintgriffith/scaffold-eth",
+  title: "🏗 Punk SC Wallet",
+  subTitle: "smart contract wallet built with scaffold-eth",
 }

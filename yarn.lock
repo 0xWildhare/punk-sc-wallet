@@ -2091,7 +2091,7 @@
     "@ethersproject/properties" "^5.4.0"
     "@ethersproject/transactions" "^5.4.0"
 
-"@ethersproject/contracts@5.6.2", "@ethersproject/contracts@^5.0.5":
+"@ethersproject/contracts@5.6.2", "@ethersproject/contracts@^5.0.5", "@ethersproject/contracts@^5.4.0":
   version "5.6.2"
   resolved "https://registry.yarnpkg.com/@ethersproject/contracts/-/contracts-5.6.2.tgz#20b52e69ebc1b74274ff8e3d4e508de971c287bc"
   integrity sha512-hguUA57BIKi6WY0kHvZp6PwPlWF87MCeB4B7Z7AbUpTxfFXFdn/3b0GmjZPagIHS+3yhcBJDnuEfU4Xz+Ks/8g==
@@ -2276,7 +2276,7 @@
   dependencies:
     "@ethersproject/logger" "^5.4.0"
 
-"@ethersproject/networks@5.6.3", "@ethersproject/networks@^5.6.3":
+"@ethersproject/networks@5.6.3", "@ethersproject/networks@^5.4.1", "@ethersproject/networks@^5.6.3":
   version "5.6.3"
   resolved "https://registry.yarnpkg.com/@ethersproject/networks/-/networks-5.6.3.tgz#3ee3ab08f315b433b50c99702eb32e0cf31f899f"
   integrity sha512-QZxRH7cA5Ut9TbXwZFiCyuPchdWi87ZtVNHWZd0R6YFgYtes2jQ3+bsslJ0WdyDe0i6QumqtoYqvY3rrQFRZOQ==
@@ -2377,7 +2377,7 @@
     bech32 "1.1.4"
     ws "7.4.6"
 
-"@ethersproject/providers@5.6.8", "@ethersproject/providers@^5.5.6":
+"@ethersproject/providers@5.6.8", "@ethersproject/providers@^5.4.1", "@ethersproject/providers@^5.5.6":
   version "5.6.8"
   resolved "https://registry.yarnpkg.com/@ethersproject/providers/-/providers-5.6.8.tgz#22e6c57be215ba5545d3a46cf759d265bb4e879d"
   integrity sha512-Wf+CseT/iOJjrGtAOf3ck9zS7AgPmr2fZ3N97r4+YXN3mBePTG2/bJ8DApl9mVwYL+RpYbNxMEkEp4mPGdwG/w==
@@ -2626,7 +2626,7 @@
     "@ethersproject/constants" "^5.4.0"
     "@ethersproject/logger" "^5.4.0"
 
-"@ethersproject/units@5.6.1", "@ethersproject/units@^5.0.6":
+"@ethersproject/units@5.6.1", "@ethersproject/units@^5.0.6", "@ethersproject/units@^5.4.0":
   version "5.6.1"
   resolved "https://registry.yarnpkg.com/@ethersproject/units/-/units-5.6.1.tgz#ecc590d16d37c8f9ef4e89e2005bda7ddc6a4e6f"
   integrity sha512-rEfSEvMQ7obcx3KWD5EWWx77gqv54K6BKiZzKxkQJqtpriVsICrktIQmKl8ReNToPeIYPnFHpXvKpi068YFZXw==
@@ -3871,6 +3871,11 @@
     tiny-invariant "^1.1.0"
     tiny-warning "^1.0.3"
     toformat "^2.0.0"
+
+"@uniswap/token-lists@^1.0.0-beta.24":
+  version "1.0.0-beta.29"
+  resolved "https://registry.yarnpkg.com/@uniswap/token-lists/-/token-lists-1.0.0-beta.29.tgz#7be3b62aeab84c710a153a115df3bb8480027684"
+  integrity sha512-b19mDY5G94GW9tKjvoNEbdApWM1GNahh5EFYs7LsBE7J3r7qNsJ6MqZYoPg73KS6GOrp8/2XdcSXRBUt6NHjZg==
 
 "@uniswap/v2-core@1.0.0":
   version "1.0.0"
@@ -6518,7 +6523,7 @@ builtin-status-codes@^3.0.0:
   resolved "https://registry.yarnpkg.com/builtin-status-codes/-/builtin-status-codes-3.0.0.tgz#85982878e21b98e1c66425e03d0174788f569ee8"
   integrity sha1-hZgoeOIbmOHGZCXgPQF0eI9Wnug=
 
-burner-provider@^1.0.15, burner-provider@^1.0.38:
+burner-provider@^1.0.38:
   version "1.0.38"
   resolved "https://registry.yarnpkg.com/burner-provider/-/burner-provider-1.0.38.tgz#a610ebfdf13220558bd2b8f3db73bad0eea8954f"
   integrity sha512-ZcZ8wNm380+l4MlVD5qhy5Gsa6Gr0Cftniksyqw6tVi+HmFuy8mvu1+eJR4Vt7NdGNWh9v74zNJVx3HQfQveUw==
@@ -9229,12 +9234,26 @@ eth-gas-reporter@^0.2.20:
     sha1 "^1.1.1"
     sync-request "^6.0.0"
 
-eth-hooks@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/eth-hooks/-/eth-hooks-1.1.2.tgz#6b8f4cd1acbb0a83714cb740fc6c6238685dd2a6"
-  integrity sha512-+K1Pkm5BRSRE+Gt3mCZsHx7gJiYahFhGbQ+ns6T/S/A4MUp2xDvDZxQRSr8Qy48jaV6Y1GtKj+mi1dpbV+GLKQ==
+eth-hooks@2.3.16:
+  version "2.3.16"
+  resolved "https://registry.yarnpkg.com/eth-hooks/-/eth-hooks-2.3.16.tgz#a19eb28cd106a9d15c9e9a4851964a9234a69645"
+  integrity sha512-2RXCxj+Un1K88Fs90qi+ltFoSZBnQSVwf/TRFOkRbvkPvWP9BVgLajHplOPdMWV2j3JHFeKvJbGPXhDLzSIKAQ==
   dependencies:
-    burner-provider "^1.0.15"
+    "@ethersproject/address" "^5.4.0"
+    "@ethersproject/bignumber" "^5.4.0"
+    "@ethersproject/bytes" "^5.4.0"
+    "@ethersproject/contracts" "^5.4.0"
+    "@ethersproject/networks" "^5.4.1"
+    "@ethersproject/providers" "^5.4.1"
+    "@ethersproject/signing-key" "^5.4.0"
+    "@ethersproject/solidity" "^5.4.0"
+    "@ethersproject/units" "^5.4.0"
+    "@uniswap/token-lists" "^1.0.0-beta.24"
+    axios "^0.21.1"
+    burner-provider "^1.0.38"
+    ethers "^5.4.1"
+    observable-hooks "^4.0.5"
+    use-debounce "^7.0.0"
 
 eth-json-rpc-errors@^1.0.1:
   version "1.1.1"
@@ -9792,7 +9811,7 @@ ethers@^5.0.0, ethers@^5.0.1, ethers@^5.0.2:
     "@ethersproject/web" "5.4.0"
     "@ethersproject/wordlists" "5.4.0"
 
-ethers@^5.0.31:
+ethers@^5.0.31, ethers@^5.4.1:
   version "5.6.8"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.6.8.tgz#d36b816b4896341a80a8bbd2a44e8cb6e9b98dd4"
   integrity sha512-YxIGaltAOdvBFPZwIkyHnXbW40f1r8mHUgapW6dxkO+6t7H6wY8POUn0Kbxrd/N7I4hHxyi7YCddMAH/wmho2w==
@@ -16024,6 +16043,11 @@ oboe@2.1.4:
   dependencies:
     http-https "^1.0.0"
 
+observable-hooks@^4.0.5:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/observable-hooks/-/observable-hooks-4.2.0.tgz#dd4df9678f90604a91f9fd66a4f924b503bfa530"
+  integrity sha512-bGjfGQI9vXrOIf1zAc3dmMqIXSqGQM+MLYOSQuqTzgP/8ptyDn9Gsm3tXXnohHkL7byyzHFc0/zuWyydUjtAFg==
+
 obuf@^1.0.0, obuf@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"
@@ -21548,6 +21572,11 @@ ursa-optional@~0.10.0:
   dependencies:
     bindings "^1.5.0"
     nan "^2.14.2"
+
+use-debounce@^7.0.0:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/use-debounce/-/use-debounce-7.0.1.tgz#380e6191cc13ad29f8e2149a12b5c37cc2891190"
+  integrity sha512-fOrzIw2wstbAJuv8PC9Vg4XgwyTLEOdq4y/Z3IhVl8DAE4svRcgyEUvrEXu+BMNgMoc3YND6qLT61kkgEKXh7Q==
 
 use@^3.1.0:
   version "3.1.1"

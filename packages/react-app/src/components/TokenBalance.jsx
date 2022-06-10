@@ -1,5 +1,5 @@
 import { formatEther } from "@ethersproject/units";
-import { useTokenBalance } from "eth-hooks";
+import { useTokenBalance } from "eth-hooks/erc/erc-20/useTokenBalance";
 import React, { useState } from "react";
 
 export default function TokenBalance(props) {

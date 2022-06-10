@@ -20,3 +20,5 @@ export { default as TokenBalance } from "./TokenBalance";
 export { default as TransactionResponseDisplay } from "./TransactionResponseDisplay";
 export { default as Wallet } from "./Wallet";
 export { default as NetworkDisplay } from "./NetworkDisplay";
+export { default as CreateModalSentOverlay } from "./CreateModalSentOverlay";
+export { default as CreateScWalletModal } from "./CreateScWalletModal";
