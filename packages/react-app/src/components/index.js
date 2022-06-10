@@ -22,3 +22,5 @@ export { default as Wallet } from "./Wallet";
 export { default as NetworkDisplay } from "./NetworkDisplay";
 export { default as CreateModalSentOverlay } from "./CreateModalSentOverlay";
 export { default as CreateScWalletModal } from "./CreateScWalletModal";
+export { default as NetworkSwitch } from "./NetworkSwitch";
+export { default as FaucetHint } from "./FaucetHint";

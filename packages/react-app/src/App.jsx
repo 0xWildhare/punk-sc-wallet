@@ -33,6 +33,8 @@ import {
   NetworkDisplay,
   CreateScWalletModal,
   CreateModalSentOverlay,
+  NetworkSwitch,
+  FaucetHint,
 } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
@@ -53,6 +55,9 @@ const { Option } = Select;
 
 const iface = new ethers.utils.Interface(ERC20.abi);
 const scWalletABI = scWallet2.abi;
+
+
+const initialNetwork = NETWORKS.localhost;
 /*
     Welcome to 🏗 scaffold-eth !
 
@@ -82,7 +87,9 @@ if (!targetNetwork) {
 const DEBUG = false;
 const NETWORKCHECK = true;
 const USE_BURNER_WALLET = true; // toggle burner wallet feature
-const USE_NETWORK_SELECTOR = false;
+const USE_NETWORK_SELECTOR = true;
+
+
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
@@ -156,6 +163,11 @@ function App(props) {
     }
     waitForNetwork()
   },[ localProvider ])*/
+
+  const networkOptions = [initialNetwork.name, "mainnet", "rinkeby"];
+
+  const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
+
 
   const [checkingBalances, setCheckingBalances] = useState();
   const [to, setTo] = useLocalStorage("to");
@@ -896,6 +908,77 @@ function App(props) {
           </Select>
         </div>
       </div>
+
+      {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
+      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
+        <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
+          {USE_NETWORK_SELECTOR && (
+            <div style={{ marginRight: 20 }}>
+
+              <NetworkSwitch
+                networkOptions={networkOptions}
+                selectedNetwork={selectedNetwork}
+                setSelectedNetwork={setSelectedNetwork}
+              />
+            </div>
+          )}
+          <Account
+            useBurner={USE_BURNER_WALLET}
+            address={address}
+            localProvider={localProvider}
+            userSigner={userSigner}
+            mainnetProvider={mainnetProvider}
+            price={price}
+            web3Modal={web3Modal}
+            loadWeb3Modal={loadWeb3Modal}
+            logoutOfWeb3Modal={logoutOfWeb3Modal}
+            blockExplorer={blockExplorer}
+          />
+        </div>
+        {yourLocalBalance.lte(ethers.BigNumber.from("0")) && (
+          <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
+        )}
+      </div>
+
+      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
+      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
+        <Row align="middle" gutter={[4, 4]}>
+          <Col span={8}>
+            <Ramp price={price} address={address} networks={NETWORKS} />
+          </Col>
+
+          <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
+            <GasGauge gasPrice={gasPrice} />
+          </Col>
+          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
+            <Button
+              onClick={() => {
+                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
+              }}
+              size="large"
+              shape="round"
+            >
+              <span style={{ marginRight: 8 }} role="img" aria-label="support">
+                💬
+              </span>
+              Support
+            </Button>
+          </Col>
+        </Row>
+        <Row align="middle" gutter={[4, 4]}>
+          <Col span={24}>
+            {
+              /*  if the local provider has a signer, let's show the faucet:  */
+              faucetAvailable ? (
+                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
+              ) : (
+                ""
+              )
+            }
+          </Col>
+        </Row>
+      </div>
+
       <div style={{ padding: 16, width: 420, margin: "auto" }}>
         <SpeedUpTransactions
            provider={userProvider}
