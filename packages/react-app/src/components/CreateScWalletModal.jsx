@@ -126,7 +126,7 @@ export default function CreateMultiSigModal({
           setPendingCreate(false);
           setTxSent(false);
         }
-
+console.log("update", update);
         if (update && (update.status === 'confirmed' || update.status === 1)) {
           console.log("tx update confirmed!");
           setPendingCreate(false);
@@ -143,7 +143,7 @@ export default function CreateMultiSigModal({
 
       setTxSent(true);
     } catch (e) {
-      console.log('CREATE MUTLI-SIG SUBMIT FAILED: ', e);
+      console.log('CREATE SC-WALLET SUBMIT FAILED: ', e);
     }
   };
 
@@ -151,7 +151,7 @@ export default function CreateMultiSigModal({
     <>
       <Button type="primary" style={{ marginRight: 10 }} onClick={showCreateModal}>Create</Button>
       <Modal
-        title="Create Multi-Sig Wallet"
+        title="Create SC Wallet"
         visible={isCreateModalVisible}
         onCancel={handleCancel}
 
@@ -168,8 +168,8 @@ export default function CreateMultiSigModal({
           <CreateModalSentOverlay
             txError={txError}
             txSuccess={txSuccess}
-            pendingText="Creating Multi-Sig"
-            successText="Multi-Sig Created"
+            pendingText="Creating SC Wallet"
+            successText="SC Wallet Created"
             errorText="Transaction Failed"
           />
         )}

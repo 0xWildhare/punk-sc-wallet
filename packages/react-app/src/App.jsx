@@ -87,7 +87,7 @@ if (!targetNetwork) {
 const DEBUG = false;
 const NETWORKCHECK = true;
 const USE_BURNER_WALLET = true; // toggle burner wallet feature
-const USE_NETWORK_SELECTOR = true;
+const USE_NETWORK_SELECTOR = false;
 
 
 
@@ -165,9 +165,6 @@ function App(props) {
   },[ localProvider ])*/
 
   const networkOptions = [initialNetwork.name, "mainnet", "rinkeby"];
-
-  const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
-
 
   const [checkingBalances, setCheckingBalances] = useState();
   const [to, setTo] = useLocalStorage("to");
@@ -666,33 +663,6 @@ function App(props) {
       </div>
     );
   }*/
-console.log("networks", NETWORKS);
-  const options = [];
-  for (const id in NETWORKS) {
-    options.push(
-      <Select.Option key={id} value={NETWORKS[id].name}>
-        <span style={{ color: NETWORKS[id].color, fontSize: 24 }}>{NETWORKS[id].name}</span>
-      </Select.Option>,
-    );
-  }
-
-  const networkSelect = (
-    <Select
-      size="medium"
-      defaultValue={targetNetwork.name}
-      style={{ textAlign: "center", width: 170, fontSize: 10 }}
-      onChange={value => {
-        if (targetNetwork.chainId != NETWORKS[value].chainId) {
-          window.localStorage.setItem("network", value);
-          setTimeout(() => {
-            window.location.reload();
-          }, 1);
-        }
-      }}
-    >
-      {options}
-    </Select>
-  );
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
