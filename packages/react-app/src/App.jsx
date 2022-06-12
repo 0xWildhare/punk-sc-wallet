@@ -79,7 +79,7 @@ const initialNetwork = NETWORKS.localhost;
 
 /// 📡 What chain are your contracts deployed to?
 const cachedNetwork = window.localStorage.getItem("network");
-let targetNetwork = NETWORKS[cachedNetwork || "ethereum"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+let targetNetwork = NETWORKS[cachedNetwork || "localhost"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 if (!targetNetwork) {
   targetNetwork = NETWORKS.xdai;
 }
@@ -666,7 +666,7 @@ function App(props) {
       </div>
     );
   }*/
-
+console.log("networks", NETWORKS);
   const options = [];
   for (const id in NETWORKS) {
     options.push(
@@ -678,9 +678,9 @@ function App(props) {
 
   const networkSelect = (
     <Select
-      size="large"
+      size="medium"
       defaultValue={targetNetwork.name}
-      style={{ textAlign: "left", width: 170, fontSize: 30 }}
+      style={{ textAlign: "center", width: 170, fontSize: 10 }}
       onChange={value => {
         if (targetNetwork.chainId != NETWORKS[value].chainId) {
           window.localStorage.setItem("network", value);
@@ -887,8 +887,8 @@ function App(props) {
         USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
       />
       {/* ✏️ Edit the header and change the title to your project name */}
-      <div style={{ position: "relative" }}>
-        <div style={{ position: "absolute", left: 20 }}>
+      <div style={{ position: "relative", }}>
+        <div style={{ position: "absolute", left: 20, display: "flex" }}>
           <CreateScWalletModal
             price={price}
             selectedChainId={selectedChainId}
@@ -906,22 +906,18 @@ function App(props) {
               <Option key={index} value={address}>{address}</Option>
             ))}
           </Select>
+
+          <NetworkSwitch
+            NETWORKS={NETWORKS}
+            targetNetwork={targetNetwork}
+          />
         </div>
       </div>
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
       <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
         <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
-          {USE_NETWORK_SELECTOR && (
-            <div style={{ marginRight: 20 }}>
 
-              <NetworkSwitch
-                networkOptions={networkOptions}
-                selectedNetwork={selectedNetwork}
-                setSelectedNetwork={setSelectedNetwork}
-              />
-            </div>
-          )}
           <Account
             useBurner={USE_BURNER_WALLET}
             address={address}
@@ -940,45 +936,6 @@ function App(props) {
         )}
       </div>
 
-      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={8}>
-            <Ramp price={price} address={address} networks={NETWORKS} />
-          </Col>
-
-          <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
-            <GasGauge gasPrice={gasPrice} />
-          </Col>
-          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
-            <Button
-              onClick={() => {
-                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
-              }}
-              size="large"
-              shape="round"
-            >
-              <span style={{ marginRight: 8 }} role="img" aria-label="support">
-                💬
-              </span>
-              Support
-            </Button>
-          </Col>
-        </Row>
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={24}>
-            {
-              /*  if the local provider has a signer, let's show the faucet:  */
-              faucetAvailable ? (
-                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-              ) : (
-                ""
-              )
-            }
-          </Col>
-        </Row>
-      </div>
-
       <div style={{ padding: 16, width: 420, margin: "auto" }}>
         <SpeedUpTransactions
            provider={userProvider}
@@ -991,10 +948,7 @@ function App(props) {
 
       <div style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto",position:"relative" }}>
         <Balance value={yourLocalBalance} size={12+window.innerWidth/16} price={price} />
-        <span style={{ verticalAlign: "middle" }}>
-          {networkSelect}
-          {faucetHint}
-        </span>
+
       </div>
 
       <div style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
@@ -1374,29 +1328,49 @@ function App(props) {
      </Modal>
   */}
 
-
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
-        <Row align="middle" gutter={[16, 16]}>
-          <Col span={12}>
+        <Row align="middle" gutter={[4, 4]}>
+          <Col span={8}>
             <Ramp price={price} address={address} networks={NETWORKS} />
           </Col>
 
-          {targetNetwork.name=="arbitrum"||targetNetwork.name=="gnosis"||targetNetwork.name=="optimism"||targetNetwork.name=="polygon"?"":<Col span={12} style={{ textAlign: "center", opacity: 0.8 }}>
+          {targetNetwork.name=="arbitrum"||targetNetwork.name=="gnosis"||targetNetwork.name=="optimism"||targetNetwork.name=="polygon"?"":
+          <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
             <GasGauge gasPrice={gasPrice} />
           </Col>}
-        </Row>
 
+          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
+            <Button
+              onClick={() => {
+                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
+              }}
+              size="large"
+              shape="round"
+            >
+              <span style={{ marginRight: 8 }} role="img" aria-label="support">
+                💬
+              </span>
+              Support
+            </Button>
+          </Col>
+        </Row>
         <Row align="middle" gutter={[4, 4]}>
           <Col span={24}>
-            {faucetAvailable ? (
-              <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-            ) : (
-              ""
-            )}
+            {
+              /*  if the local provider has a signer, let's show the faucet:  */
+              faucetAvailable ? (
+                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
+              ) : (
+                ""
+              )
+            }
           </Col>
         </Row>
       </div>
+
+
+
     </div>
   );
 }
