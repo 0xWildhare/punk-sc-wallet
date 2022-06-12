@@ -2,7 +2,7 @@ import { CaretUpOutlined, ScanOutlined, SendOutlined, ReloadOutlined } from "@an
 import { JsonRpcProvider, StaticJsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { formatEther, parseEther } from "@ethersproject/units";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { Alert, Button, Col, Row, Select, Input, Modal, notification } from "antd";
+import { Alert, Button, Col, Row, Select, Input, Menu, Modal, notification } from "antd";
 import "antd/dist/antd.css";
 import {
   useBalance,
@@ -15,6 +15,7 @@ import {
 } from "eth-hooks";
 import { useEventListener } from "eth-hooks/events/";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
+import { Link, Route, Switch, BrowserRouter, useLocation } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
 import {
@@ -36,6 +37,7 @@ import {
   NetworkSwitch,
   FaucetHint,
 } from "./components";
+import { Home, Hints, } from "./views"
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
 import { useExchangePrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
@@ -164,7 +166,6 @@ function App(props) {
     waitForNetwork()
   },[ localProvider ])*/
 
-  const networkOptions = [initialNetwork.name, "mainnet", "rinkeby"];
 
   const [checkingBalances, setCheckingBalances] = useState();
   const [to, setTo] = useLocalStorage("to");
@@ -776,9 +777,12 @@ function App(props) {
         if (recentScWalletAddress !== currentScWalletAddress) setContractNameForEvent(null);
         setCurrentScWalletAddress(recentScWalletAddress);
         setScWallets(scWalletsForUser);
+
       }
     }
   }, [ownersScWalletEvents, address]);
+
+
 
 
   const [signaturesRequired, setSignaturesRequired] = useState(0);
@@ -915,143 +919,72 @@ function App(props) {
            chainId={targetNetwork.chainId}
          />
       </div>
+      <BrowserRouter>
+        <Menu style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
+          <Menu.Item key="/">
+            <Link
+              onClick={() => {
+                setRoute("/");
+              }}
+              to="/"
+            >
+              Home
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/hints">
+            <Link
+              onClick={() => {
+                setRoute("/hints");
+              }}
+              to="/hints"
+            >
+              Hints
+            </Link>
+          </Menu.Item>
+        </Menu>
 
-      <div style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto",position:"relative" }}>
-        <Balance value={yourLocalBalance} size={12+window.innerWidth/16} price={price} />
-
-      </div>
-
-      <div style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
-        <QRPunkBlockie withQr address={address} showAddress={true} />
-      </div>
-
-      <div style={{ position: "relative", width: 320, margin: "auto", textAlign: "center", marginTop: 32 }}>
-        <div style={{ padding: 10 }}>
-          <AddressInput
-            ensProvider={mainnetProvider}
-            placeholder="to address"
-            disabled={walletConnectTx}
-            value={toAddress}
-            onChange={setToAddress}
-            hoistScanner={toggle => {
-              scanner = toggle;
-            }}
-            walletConnect={(wcLink)=>{
-              //if(walletConnectUrl){
-                /*try{
-                  //setConnected(false);
-                  //setWalletConnectUrl();
-                  //if(wallectConnectConnector) wallectConnectConnector.killSession();
-                  //if(wallectConnectConnectorSession) setWallectConnectConnectorSession("");
-                  setConnected(false);
-                  //if(wallectConnectConnector) wallectConnectConnector.killSession();
-                  localStorage.removeItem("walletConnectUrl")
-                  localStorage.removeItem("wallectConnectConnectorSession")
-                }catch(e){console.log(e)}
-              }
-
-              setTimeout(()=>{
-                window.location.replace('/wc?uri='+wcLink);
-              },500)*/
-
-              if(walletConnectUrl){
-                //existing session... need to kill it and then connect new one....
-                setConnected(false);
-                if(wallectConnectConnector) wallectConnectConnector.killSession();
-                localStorage.removeItem("walletConnectUrl")
-                localStorage.removeItem("wallectConnectConnectorSession")
-                localStorage.setItem("wallectConnectNextSession",wcLink)
-              }else{
-                setWalletConnectUrl(wcLink)
-              }
-
-            }}
-          />
-        </div>
-
-        <div style={{ padding: 10 }}>
-          {walletConnectTx ? <Input disabled={true} value={amount}/>:<EtherInput
+        <Switch>
+        <Route exact path="/">
+          <Home
+            address={currentScWalletAddress}
+            localProvider={localProvider}
             price={price || targetNetwork.price}
             value={amount}
             token={targetNetwork.token || "ETH"}
-            onChange={value => {
-              setAmount(value);
-            }}
-          />}
-
-        </div>
-        {/*
-          <div style={{ padding: 10 }}>
-          <Input
-          placeholder="data (0x0000)"
-          value={data}
-          disabled={walletConnectTx}
-          onChange={(e)=>{
-            setData(e.target.value)
-          }}
-          />
-          </div>
-
-        <div style={{ position: "relative", top: 10, left:40 }}> {networkDisplay} </div>
-        */}
-        <div style={{ padding: 10 }}>
-          <Button
-            key="submit"
-            type="primary"
-            disabled={loading || !amount || !toAddress}
+            setAmount={setAmount}
+            walletConnectTx={walletConnectTx}
             loading={loading}
-            onClick={async () => {
-              setLoading(true);
+            targetNetwork={targetNetwork}
+            amount={amount}
+            walletConnectUrl={walletConnectUrl}
+            connected={connected}
+            setConnected={setConnected}
+            wallectConnectConnector={wallectConnectConnector}
+            setWalletConnectUrl={setWalletConnectUrl}
+            mainnetProvider={mainnetProvider}
+            toAddress={toAddress}
+            setToAddress={setToAddress}
+            scanner={scanner}
+            selectedChainId={selectedChainId}
+            gasPrice={gasPrice}
+            tx={tx}
+            setData={setData}
+            setLoading={setLoading}
 
-              let value;
-              try {
+          />
+        </Route>
+        <Route path="/hints">
+            <Hints
+              address={address}
+              yourLocalBalance={yourLocalBalance}
+              mainnetProvider={mainnetProvider}
+              price={price}
+            />
+          </Route>
+        </Switch>
+      </BrowserRouter>
 
-                console.log("PARSE ETHER",amount)
-                value = parseEther("" + amount);
-                console.log("PARSEDVALUE",value)
-              } catch (e) {
-                const floatVal = parseFloat(amount).toFixed(8);
 
-                console.log("floatVal",floatVal)
-                // failed to parseEther, try something else
-                value = parseEther("" + floatVal);
-                console.log("PARSEDfloatVALUE",value)
-              }
-
-              let txConfig = {
-                to: toAddress,
-                chainId: selectedChainId,
-                value,
-              }
-
-              if(targetNetwork.name=="arbitrum"){
-                //txConfig.gasLimit = 21000;
-                //ask rpc for gas price
-              }else if(targetNetwork.name=="optimism"){
-                //ask rpc for gas price
-              }else if(targetNetwork.name=="gnosis"){
-                //ask rpc for gas price
-              }else if(targetNetwork.name=="polygon"){
-                  //ask rpc for gas price
-              }else{
-                txConfig.gasPrice = gasPrice
-              }
-
-              console.log("SEND AND NETWORK",targetNetwork)
-              let result = tx(txConfig);
-              // setToAddress("")
-              setAmount("");
-              setData("");
-              result = await result;
-              console.log(result);
-              setLoading(false);
-            }}
-          >
-            {loading || !amount || !toAddress ? <CaretUpOutlined /> : <SendOutlined style={{ color: "#FFFFFF" }} />}{" "}
-            Send
-          </Button>
-        </div>
-      </div>
 
       {/* <BrowserRouter>
 
@@ -1165,48 +1098,6 @@ function App(props) {
         </Switch>
       </BrowserRouter>
 */}
-
-      <div style={{ zIndex: -1, paddingTop: 128, opacity: 0.5, fontSize: 12 }}>
-        <Button
-          style={{ margin:8, marginTop: 16 }}
-          onClick={() => {
-            window.open("https://zapper.fi/account/"+address+"?tab=history");
-          }}
-        >
-          <span style={{ marginRight: 8 }}>📜</span>History
-        </Button>
-
-        <Button
-          style={{  margin:8, marginTop: 16, }}
-          onClick={() => {
-            window.open("https://zapper.fi/account/"+address);
-          }}
-        >
-          <span style={{ marginRight: 8 }}>👛</span> Inventory
-        </Button>
-
-
-
-      </div>
-
-      <div style={{ clear: "both", width: 500, margin: "auto" ,marginTop:32, position:"relative"}}>
-        {connected?<span style={{cursor:"pointer",padding:8,fontSize:30,position:"absolute",top:-16,left:28}}>✅</span>:""}
-        <Input
-          style={{width:"70%"}}
-          placeholder={"wallet connect url (or use the scanner-->)"}
-          value={walletConnectUrl}
-          disabled={connected}
-          onChange={(e)=>{
-            setWalletConnectUrl(e.target.value)
-          }}
-        />{connected?<span style={{cursor:"pointer",padding:10,fontSize:30,position:"absolute", top:-18}} onClick={()=>{
-          setConnected(false);
-          if(wallectConnectConnector) wallectConnectConnector.killSession();
-          localStorage.removeItem("walletConnectUrl")
-          localStorage.removeItem("wallectConnectConnectorSession")
-        }}>🗑</span>:""}
-      </div>
-
 
       { targetNetwork.name=="ethereum" ? <div style={{ zIndex: -1, padding: 64, opacity: 0.5, fontSize: 12 }}>
         {

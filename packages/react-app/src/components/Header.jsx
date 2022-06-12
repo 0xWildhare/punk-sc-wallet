@@ -19,5 +19,5 @@ export default function Header({link, title, subTitle}) {
 Header.defaultProps = {
   link: "https://github.com/austintgriffith/scaffold-eth",
   title: "🏗 Punk SC Wallet",
-  subTitle: "smart contract wallet built with scaffold-eth",
+  subTitle: "smart contract wallet",
 }
