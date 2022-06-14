@@ -86,7 +86,7 @@ if (!targetNetwork) {
   targetNetwork = NETWORKS.xdai;
 }
 // 😬 Sorry for all the console logging
-const DEBUG = false;
+const DEBUG = true;
 const NETWORKCHECK = true;
 const USE_BURNER_WALLET = true; // toggle burner wallet feature
 const USE_NETWORK_SELECTOR = false;
@@ -281,7 +281,7 @@ function App(props) {
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
-
+console.log("writeContracts: ", writeContracts);
 
   // Faucet Tx can be used to send funds from the faucet
   const faucetTx = Transactor(localProvider, gasPrice);
@@ -349,37 +349,6 @@ function App(props) {
       }
 
       console.log("REQUEST PERMISSION TO:",payload,payload.params[0])
-      // Handle Call Request
-      //console.log("SETTING TO",payload.params[0].to)
-
-      //setWalletConnectTx(true)
-
-      //setToAddress(payload.params[0].to)
-      //setData(payload.params[0].data?payload.params[0].data:"0x0000")
-
-      //let bigNumber = ethers.BigNumber.from(payload.params[0].value)
-      //console.log("bigNumber",bigNumber)
-
-      //let newAmount = ethers.utils.formatEther(bigNumber)
-      //console.log("newAmount",newAmount)
-      //if(props.price){
-      //  newAmount = newAmount.div(props.price)
-      //}
-      //setAmount(newAmount)
-
-      /* payload:
-      {
-        id: 1,
-        jsonrpc: '2.0'.
-        method: 'eth_sign',
-        params: [
-          "0xbc28ea04101f03ea7a94c1379bc3ab32e65e62d3",
-          "My email is john@doe.com - 1537836206101"
-        ]
-      }
-      */
-
-      //setWalletModalData({payload:payload,connector: connector})
 
       confirm({
           width: "90%",
@@ -741,8 +710,6 @@ function App(props) {
   const [data, setData] = useState();
   const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", startingAddress, 120000);
 
-  const [walletConnectTx, setWalletConnectTx] = useState();
-
   const [loading, setLoading] = useState(false);
 
   const [depositing, setDepositing] = useState();
@@ -754,7 +721,7 @@ function App(props) {
   const contractAddress = readContracts?.ScWallet?.address;
 
   //📟 Listen for broadcast events
-
+//TODO: why tf isn't this working on roopsten?
   // ScWalletFactory Events:    Listens for a new sc wallet
   const ownersScWalletEvents = useEventListener(readContracts, "ScWalletFactory", "Owners", localProvider, 1);
   if(DEBUG) console.log("📟 ownersScWalletEvents:", ownersScWalletEvents);
@@ -843,6 +810,8 @@ function App(props) {
       <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} />
     );
 
+  const userHasScWallets = currentScWalletAddress ? true : false;
+
   const handleScWalletChange = (value) => {
     setContractNameForEvent(null);
     setCurrentScWalletAddress(value);
@@ -874,6 +843,7 @@ function App(props) {
             contractName={'ScWalletFactory'}
             isCreateModalVisible={isCreateModalVisible}
             setIsCreateModalVisible={setIsCreateModalVisible}
+            token={targetNetwork.token || "ETH"}
           />
           <Select value={[currentScWalletAddress]} style={{ width: 120 }} onChange={handleScWalletChange}>
             {scWallets.map((address, index) => (
@@ -920,7 +890,7 @@ function App(props) {
          />
       </div>
       <BrowserRouter>
-        <Menu style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
+        <Menu disabled={!userHasScWallets} style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
           <Menu.Item key="/">
             <Link
               onClick={() => {
@@ -945,6 +915,13 @@ function App(props) {
 
         <Switch>
         <Route exact path="/">
+        {!userHasScWallets ?
+          <Row style={{ marginTop: 40 }}>
+            <Col span={12} offset={6}>
+              <Alert message={<>✨ <Button onClick={() => setIsCreateModalVisible(true)} type="link" style={{ padding: 0 }}>Create</Button> or select your SC wallet ✨</>} type="info" />
+            </Col>
+          </Row>
+        :
           <Home
             address={currentScWalletAddress}
             localProvider={localProvider}
@@ -952,7 +929,6 @@ function App(props) {
             value={amount}
             token={targetNetwork.token || "ETH"}
             setAmount={setAmount}
-            walletConnectTx={walletConnectTx}
             loading={loading}
             targetNetwork={targetNetwork}
             amount={amount}
@@ -971,7 +947,7 @@ function App(props) {
             setData={setData}
             setLoading={setLoading}
 
-          />
+          />}
         </Route>
         <Route path="/hints">
             <Hints

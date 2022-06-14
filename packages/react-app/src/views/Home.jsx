@@ -21,7 +21,6 @@ export default function Home({
   value,
   token,
   setAmount,
-  walletConnectTx,
   loading,
   targetNetwork,
   amount,
@@ -41,6 +40,8 @@ export default function Home({
   setWalletConnectUrl,
 
 }) {
+
+  const [walletConnectTx, setWalletConnectTx] = useState();
 
 
   return (

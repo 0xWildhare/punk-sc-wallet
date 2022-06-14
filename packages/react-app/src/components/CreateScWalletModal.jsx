@@ -19,6 +19,7 @@ export default function CreateMultiSigModal({
   contractName,
   isCreateModalVisible,
   setIsCreateModalVisible,
+  token,
 }) {
   const [pendingCreate, setPendingCreate] = useState(false);
   const [txSent, setTxSent] = useState(false);
@@ -210,10 +211,11 @@ console.log("update", update);
           </div>
           <div style={{ width: "90%" }}>
             <EtherInput
-              placeholder="Fund your multi-sig (optional)"
+              placeholder="Fund your SC wallet (optional)"
               price={price}
               mode="USD"
               value={amount}
+              token={token}
               onChange={setAmount}
             />
           </div>
