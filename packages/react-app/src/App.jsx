@@ -316,7 +316,7 @@ console.log("writeContracts: ", writeContracts);
 
       connector.approveSession({
         accounts: [                 // required
-          address
+          currentScWalletAddress
         ],
         chainId: targetNetwork.chainId               // required
       })
@@ -721,10 +721,10 @@ console.log("writeContracts: ", writeContracts);
   const contractAddress = readContracts?.ScWallet?.address;
 
   //📟 Listen for broadcast events
-//TODO: why tf isn't this working on roopsten?
+//TODO: why tf isn't this working on roopsten? (also does not work for rinkeby)
   // ScWalletFactory Events:    Listens for a new sc wallet
   const ownersScWalletEvents = useEventListener(readContracts, "ScWalletFactory", "Owners", localProvider, 1);
-  if(DEBUG) console.log("📟 ownersScWalletEvents:", ownersScWalletEvents);
+  if(DEBUG) console.log("📟 ownersScWalletEvents:", ownersScWalletEvents, readContracts, localProvider);
 
   const [scWallets, setScWallets] = useState([]);
   const [currentScWalletAddress, setCurrentScWalletAddress] = useState();
