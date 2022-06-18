@@ -1,21 +1,18 @@
-import { WalletOutlined } from "@ant-design/icons";
-import { Button, message, Modal, Spin, Tooltip, Typography, Input, Space  } from "antd";
-import { useUserAddress } from "eth-hooks";
-import { ethers } from "ethers";
-import QR from "qrcode.react";
+import { Button, Modal, Spin, Tooltip, Typography } from "antd";
 import React, { useState, useEffect } from "react";
-import { Blockie } from ".";
+import { ethers } from "ethers";
+import { KeyOutlined, QrcodeOutlined, SendOutlined, WalletOutlined } from "@ant-design/icons";
+import QR from "qrcode.react";
+
+import { Transactor } from "../helpers";
 import Address from "./Address";
+import AddressInput from "./AddressInput";
 import Balance from "./Balance";
-import QRPunkBlockie from "./QRPunkBlockie";
-import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import EtherInput from "./EtherInput";
 
-const bip39 = require('bip39');
-const hdkey = require('ethereumjs-wallet/hdkey');
+const { Text, Paragraph } = Typography;
 
-const { Text } = Typography;
-
-/*
+/**
   ~ What it does? ~
 
   Displays a wallet where you can specify address and send USD/ETH, with options to
@@ -41,75 +38,44 @@ const { Text } = Typography;
               (ex. "0xa870" => "user.eth") or you can enter directly ENS name instead of address
   - Provide price={price} of ether and easily convert between USD and ETH
   - Provide color to specify the color of wallet icon
-*/
+**/
 
 export default function Wallet(props) {
-  const signerAddress = useUserAddress(props.provider);
+  const [signerAddress, setSignerAddress] = useState();
+  useEffect(() => {
+    async function getAddress() {
+      if (props.signer) {
+        const newAddress = await props.signer.getAddress();
+        setSignerAddress(newAddress);
+      }
+    }
+    getAddress();
+  }, [props.signer]);
+
   const selectedAddress = props.address || signerAddress;
 
   const [open, setOpen] = useState();
   const [qr, setQr] = useState();
   const [amount, setAmount] = useState();
   const [toAddress, setToAddress] = useState();
-
-  const [showPrivate, setShowPrivate] = useState();
-
-  const [showImport, setShowImport] = useState();
-
-  const [importMnemonic, setImportMnemonic] = useState();
-  const [importMnemonicIndex, setImportMnemonicIndex] = useState("0");
-  const [importPrivatekey, setImportPrivatekey] = useState();
-  const [importAddress, setImportAddress] = useState();
-
-  const [deleteCurrentBurner, setDeleteCurrentBurner] = useState( false );
-
-  useEffect(()=>{
-    const calculatePK = async () => {
-      if(importMnemonic){
-        const seed = await bip39.mnemonicToSeed(importMnemonic)
-        console.log("seed",seed)
-        const hdwallet = hdkey.fromMasterSeed(seed);
-        console.log("hdwallet",hdwallet)
-        const wallet_hdpath = "m/44'/60'/0'/0/";
-        const fullPath = wallet_hdpath + importMnemonicIndex
-        console.log("fullPath",fullPath)
-        const wallet = hdwallet.derivePath(fullPath).getWallet();
-        console.log("wallet",wallet)
-        const privateKey = wallet._privKey.toString('hex');
-        console.log("privateKey",privateKey)
-        setImportPrivatekey("0x"+privateKey)
-      }else{
-        setImportPrivatekey()
-      }
-    }
-    calculatePK()
-  },[importMnemonic, importMnemonicIndex])
-
-  useEffect(()=>{
-    const calculateAddress = async () => {
-      if(importPrivatekey){
-        try{
-          const officialEthersWallet = new ethers.Wallet(importPrivatekey)
-          console.log(officialEthersWallet)
-          setImportAddress(officialEthersWallet.address)
-        }catch(e){
-          console.log(e)
-          setImportAddress("")
-        }
-      }
-    }
-    calculateAddress()
-  },[ importPrivatekey ])
-
-
+  const [pk, setPK] = useState();
 
   const providerSend = props.provider ? (
+    <Tooltip title="Wallet">
       <WalletOutlined
-        style={{ fontSize: 32, color: "#1890ff" }}
         onClick={() => {
           setOpen(!open);
         }}
+        rotate={-90}
+        style={{
+          padding: props.padding ? props.padding : 7,
+          color: props.color ? props.color : "",
+          cursor: "pointer",
+          fontSize: props.size ? props.size : 28,
+          verticalAlign: "middle",
+        }}
       />
+    </Tooltip>
   ) : (
     ""
   );
@@ -117,7 +83,7 @@ export default function Wallet(props) {
   let display;
   let receiveButton;
   let privateKeyButton;
-  /* if (qr) {
+  if (qr) {
     display = (
       <div>
         <div>
@@ -133,343 +99,102 @@ export default function Wallet(props) {
         />
       </div>
     );
-    receiveButton = ""
+    receiveButton = (
+      <Button
+        key="hide"
+        onClick={() => {
+          setQr("");
+        }}
+      >
+        <QrcodeOutlined /> Hide
+      </Button>
+    );
     privateKeyButton = (
-     <Button key="hide" onClick={()=>{setPK(selectedAddress);setQr("")}}>
-       <KeyOutlined /> Private Key
-     </Button>
-   )
- }else if(pk){
-*/
-
-  const punkSize = 45;
-
-  const pk = localStorage.getItem("metaPrivateKey");
-  const wallet = new ethers.Wallet(pk);
-
-  if (wallet.address !== selectedAddress) {
-    display = (
-      <div>
-        <b>*injected account*, private key unknown</b>
-      </div>
+      <Button
+        key="hide"
+        onClick={() => {
+          setPK(selectedAddress);
+          setQr("");
+        }}
+      >
+        <KeyOutlined /> Private Key
+      </Button>
     );
-  } else {
-    const extraPkDisplayAdded = {};
-    const extraPkDisplay = [];
-    const mypart1 = wallet.address && wallet.address.substr(2, 20);
-    const mypart2 = wallet.address && wallet.address.substr(22);
-    const myx = parseInt(mypart1, 16) % 100;
-    const myy = parseInt(mypart2, 16) % 100;
-    extraPkDisplayAdded[wallet.address] = true;
-    extraPkDisplay.push(
-      <div style={{ fontSize: 38, fontWeight: "bolder", padding: 2, backgroundStyle: "#89e789" }}>
-        <div style={{float:'right'}}>
-          <Button
-            style={{ marginTop: 16 }}
-            onClick={() => {
-              setDeleteCurrentBurner(true)
-            }}
-          >
-            <span style={{ marginRight: 8 }}>☢️</span> Delete
-          </Button>
-        </div>
-        <div style={{ float: "left", position: "relative", width: punkSize, height: punkSize, overflow: "hidden" }}>
-          <img
-            src="/punks.png"
-            style={{
-              position: "absolute",
-              left: -punkSize * myx,
-              top: -punkSize * myy,
-              width: punkSize * 100,
-              height: punkSize * 100,
-              imageRendering: "pixelated",
-            }}
-          />
-        </div>
-        <a href={"/pk#" + pk}>
-          <Blockie address={wallet.address} scale={4} /> {wallet.address.substr(0, 6)}
-        </a>
-      </div>,
-    );
+  } else if (pk) {
+    const pk = localStorage.getItem("metaPrivateKey");
+    const wallet = new ethers.Wallet(pk);
 
-    let secondBestAccount;
-
-    for (const key in localStorage) {
-      if (key.indexOf("metaPrivateKey_backup") >= 0) {
-        // console.log(key)
-        const pastpk = localStorage.getItem(key);
-        secondBestAccount = pastpk;
-        const pastwallet = new ethers.Wallet(pastpk);
-        if (!extraPkDisplayAdded[pastwallet.address] /* && selectedAddress!=pastwallet.address */) {
-          extraPkDisplayAdded[pastwallet.address] = true;
-          const part1 = pastwallet.address && pastwallet.address.substr(2, 20);
-          const part2 = pastwallet.address && pastwallet.address.substr(22);
-          const x = parseInt(part1, 16) % 100;
-          const y = parseInt(part2, 16) % 100;
-          extraPkDisplay.push(
-            <div style={{ fontSize: 32 }}>
-              <a href={"/pk#" + pastpk}>
-                <div
-                  style={{ float: "left", position: "relative", width: punkSize, height: punkSize, overflow: "hidden" }}
-                >
-                  <img
-                    src="/punks.png"
-                    style={{
-                      position: "absolute",
-                      left: -punkSize * x,
-                      top: -punkSize * y,
-                      width: punkSize * 100,
-                      height: punkSize * 100,
-                      imageRendering: "pixelated",
-                    }}
-                  />
-                </div>
-                <Blockie address={pastwallet.address} scale={3.8} /> {pastwallet.address.substr(0, 6)}
-              </a>
-            </div>,
-          );
+    if (wallet.address !== selectedAddress) {
+      display = (
+        <div>
+          <b>*injected account*, private key unknown</b>
+        </div>
+      );
+    } else {
+      const extraPkDisplayAdded = {};
+      const extraPkDisplay = [];
+      extraPkDisplayAdded[wallet.address] = true;
+      extraPkDisplay.push(
+        <div style={{ fontSize: 16, padding: 2, backgroundStyle: "#89e789" }}>
+          <a href={"/pk#" + pk}>
+            <Address minimized address={wallet.address} ensProvider={props.ensProvider} /> {wallet.address.substr(0, 6)}
+          </a>
+        </div>,
+      );
+      for (const key in localStorage) {
+        if (key.indexOf("metaPrivateKey_backup") >= 0) {
+          console.log(key);
+          const pastpk = localStorage.getItem(key);
+          const pastwallet = new ethers.Wallet(pastpk);
+          if (!extraPkDisplayAdded[pastwallet.address] /* && selectedAddress!=pastwallet.address */) {
+            extraPkDisplayAdded[pastwallet.address] = true;
+            extraPkDisplay.push(
+              <div style={{ fontSize: 16 }}>
+                <a href={"/pk#" + pastpk}>
+                  <Address minimized address={pastwallet.address} ensProvider={props.ensProvider} />{" "}
+                  {pastwallet.address.substr(0, 6)}
+                </a>
+              </div>,
+            );
+          }
         }
       }
-    }
 
-    let currentButton = (
-      <span style={{ marginRight: 4 }}>
-        <span style={{ marginRight: 8 }}>⛔️</span> Reveal{" "}
-      </span>
-    );
-    let privateKeyDisplay = "";
-    if (showPrivate) {
-      currentButton = (
-        <span style={{ marginRight: 4 }}>
-          <span style={{ marginRight: 8 }}>😅</span> Hide{" "}
-        </span>
-      );
-
-      const fullLink = window.origin + "/pk#" + pk
-
-      privateKeyDisplay = (
+      display = (
         <div>
           <b>Private Key:</b>
+
           <div>
-            <Text style={{ fontSize: 11 }} copyable>
-              {pk}
-            </Text>
+            <Text copyable>{pk}</Text>
           </div>
 
-          <div style={{marginTop:16}}>
-            <div><b>Punk Wallet:</b></div>
-            <Text style={{ fontSize: 11 }} copyable>
-              {fullLink}
-            </Text>
-          </div>
+          <hr />
 
-          <div
-            style={{ cursor: "pointer" }}
-            onClick={() => {
-              const el = document.createElement("textarea");
-              el.value = window.origin + "/pk#" + pk;
-              document.body.appendChild(el);
-              el.select();
-              document.execCommand("copy");
-              document.body.removeChild(el);
-              message.success(<span style={{ position: "relative" }}>Copied Private Key Link</span>);
-            }}
-          >
-            <div style={{position:"relative",top:34,left:-11}}>
-              <QRPunkBlockie withQr={false} address={selectedAddress} />
-            </div>
+          <i>
+            Point your camera phone at qr code to open in
+            <a target="_blank" href={"https://xdai.io/" + pk} rel="noopener noreferrer">
+              burner wallet
+            </a>
+            :
+          </i>
+          <QR
+            value={"https://xdai.io/" + pk}
+            size="450"
+            level="H"
+            includeMargin
+            renderAs="svg"
+            imageSettings={{ excavate: false }}
+          />
 
-            <QR
-              value={fullLink}
-              size="450"
-              level="H"
-              includeMargin
-              renderAs="svg"
-              imageSettings={{ excavate: true,width:105,height:105 /*, src: "https://punkwallet.io/punk.png",*/}}
-            />
-            <div style={{position:"relative",top:-285,left:172}}>
-              🔑
-            </div>
-            <div style={{position:"relative",top:-305,left:266}}>
-              🔑
-            </div>
-            <div style={{position:"relative",top:-244,left:172}}>
-              🔑
-            </div>
-            <div style={{position:"relative",top:-265,left:262}}>
-              🔑
-            </div>
-          </div>
+          <Paragraph style={{ fontSize: "16" }} copyable>
+            {"https://xdai.io/" + pk}
+          </Paragraph>
 
-        </div>
-      );
-    }
-
-    /*
-    const [importMnemonic, setImportMnemonic] = useState();
-    const [importMnemonicIndex, setImportMnemonicIndex] = useState();
-    const [importPrivatekey, setImportPrivatekey] = useState();
-    const [importAddress, setImportAddress] = useState();*/
-
-    if ( deleteCurrentBurner ){
-
-      display = (
-        <div>
-
-          <h2>Remove this private key from this device?</h2>
-
-          <div style={{ float: "left", position: "relative", width: punkSize, height: punkSize, overflow: "hidden" }}>
-            <img
-              src="/punks.png"
-              style={{
-                position: "absolute",
-                left: -punkSize * myx,
-                top: -punkSize * myy,
-                width: punkSize * 100,
-                height: punkSize * 100,
-                imageRendering: "pixelated",
-              }}
-            />
-          </div>
-
-          <div style={{float:'right'}}><Button
-            style={{ marginTop: 16 }}
-            onClick={() => {
-              //setDeleteCurrentBurner(false)
-              console.log("DELETE THE CURRENT AND FALLBACK TO ",secondBestAccount)
-
-              const currentvalueis =  window.localStorage.getItem("metaPrivateKey")
-              console.log("currentvalueis",currentvalueis)
-
-              window.localStorage.setItem("metaPrivateKey",secondBestAccount)
-
-              //now tear through all the backups and remove them if they match
-              for (const key in localStorage) {
-                if (key.indexOf("metaPrivateKey_backup") >= 0) {
-                  const pastpk = localStorage.getItem(key);
-                  if(pastpk==currentvalueis){
-                    window.localStorage.removeItem(key)
-                    //console.log("FOUND DELETE",key)
-                  }
-                }
-              }
-              setTimeout(()=>{window.location.reload();},100)
-
-            }}
-          >
-            <span style={{ marginRight: 8 }}>☢️</span>Delete
-          </Button></div>
-          <Button
-            style={{ marginTop: 16 }}
-            onClick={() => {
-              setDeleteCurrentBurner(false)
-            }}
-          >
-            <span style={{ marginRight: 8 }}>💾</span>Keep
-          </Button>
-
-        </div>
-
-      )
-
-    } else if(showImport){
-      display = (
-        <div>
-              <div style={{marginTop:21, width:420}}><h2>IMPORT</h2></div>
-
-              <div style={{opacity:0.5}}>mnemonic</div>
-              <Input.Password  style={{width:380}} size="large" placeholder="word1 word2 word3" onChange={async (e)=>{
-                setImportMnemonic(e.target.value)
-              }}/>
-
-
-              <Input style={{ width:69 }} value={importMnemonicIndex} onChange={(e)=>{
-                setImportMnemonicIndex(e.target.value)
-              }}size="large" />
-
-              <div style={{marginTop:21, width:420}}><h4>OR</h4></div>
-
-              <div style={{ opacity:0.5}}>private key</div>
-              <Input.Password disabled={importMnemonic}  style={{width:420}} size="large" value={importPrivatekey} placeholder="0x..." onChange={(e)=>{
-                setImportPrivatekey(e.target.value)
-              }}/>
-
-              <hr/>
-
-              {importAddress?<div style={{width:420,height:200}}>
-                <div style={{float:"right",marginTop:64}}>
-                  <Address value={importAddress}/>
-                </div>
-                <div style={{ position:"relative", top:-100, left:-100}}>
-                <QRPunkBlockie withQr={false} address={importAddress} />
-
-              </div><hr/></div>:""}
-
-
-
-          <div style={{float:'right'}}><Button
-            style={{ marginTop: 16 }}
-            disabled={ !importPrivatekey || importMnemonic && importMnemonic.length < 7 } //safety third!
-            onClick={() => {
-              const currentPrivateKey = window.localStorage.getItem("metaPrivateKey");
-              if (currentPrivateKey) {
-                window.localStorage.setItem("metaPrivateKey_backup" + Date.now(), currentPrivateKey);
-              }
-
-              try{
-                const officialEthersWallet = new ethers.Wallet(importPrivatekey.trim())
-                console.log(officialEthersWallet)
-                setImportAddress(officialEthersWallet.address)
-                window.localStorage.setItem("metaPrivateKey", importPrivatekey);
-                window.location.reload();
-                //setShowImport(!showImport)
-              }catch(e){
-                console.log(e)
-              }
-
-            }}
-          >
-            <span style={{ marginRight: 8 }}>💾</span>Save
-          </Button></div>
-              <Button
-                style={{ marginTop: 16 }}
-                onClick={() => {
-                  setShowImport(false)
-                }}
-              >
-                <span style={{ marginRight: 8 }}>⏪</span>Cancel
-              </Button>
-        </div>
-      );
-    }else{
-      display = (
-        <div>
-          {privateKeyDisplay}
-          <div style={{ marginBottom: 32, paddingBottom: 32, borderBottom: "1px solid #CCCCCC" }}>
-            <Button
-              style={{ marginTop: 16 }}
-              onClick={() => {
-                setShowPrivate(!showPrivate);
-              }}
-            >
-              {" "}
-              {currentButton} Private Key
-            </Button>
-          </div>
           {extraPkDisplay ? (
-            <div style={{ paddingBottom: 32, borderBottom: "1px solid #CCCCCC" }}>
-              <h3>Switch Account:</h3>
+            <div>
+              <h3>Known Private Keys:</h3>
               {extraPkDisplay}
-              <div style={{float:'right'}}><Button
-                style={{ marginTop: 16 }}
-                onClick={() => {
-                  setShowImport(!showImport)
-                }}
-              >
-                <span style={{ marginRight: 8 }}>💾</span>Import
-              </Button></div>
               <Button
-                style={{ marginTop: 16 }}
                 onClick={() => {
                   const currentPrivateKey = window.localStorage.getItem("metaPrivateKey");
                   if (currentPrivateKey) {
@@ -481,9 +206,8 @@ export default function Wallet(props) {
                   window.location.reload();
                 }}
               >
-                <span style={{ marginRight: 8 }}>⚙️</span>Generate
+                Generate
               </Button>
-
             </div>
           ) : (
             ""
@@ -492,9 +216,29 @@ export default function Wallet(props) {
       );
     }
 
-  }
-
-  /* } else {
+    receiveButton = (
+      <Button
+        key="receive"
+        onClick={() => {
+          setQr(selectedAddress);
+          setPK("");
+        }}
+      >
+        <QrcodeOutlined /> Receive
+      </Button>
+    );
+    privateKeyButton = (
+      <Button
+        key="hide"
+        onClick={() => {
+          setPK("");
+          setQr("");
+        }}
+      >
+        <KeyOutlined /> Hide
+      </Button>
+    );
+  } else {
     const inputStyle = {
       padding: 10,
     };
@@ -533,29 +277,37 @@ export default function Wallet(props) {
       </Button>
     );
     privateKeyButton = (
-      <Button key="hide" onClick={()=>{setPK(selectedAddress);setQr("")}}>
+      <Button
+        key="hide"
+        onClick={() => {
+          setPK(selectedAddress);
+          setQr("");
+        }}
+      >
         <KeyOutlined /> Private Key
       </Button>
     );
-  } */
+  }
 
   return (
-    <span style={{ verticalAlign: "middle", paddingLeft: 16, fontSize: 32 }}>
+    <span>
       {providerSend}
       <Modal
         visible={open}
         title={
-          <div>
+          <div style={{  display: "flex", alignItems: "center", justifyContent: "space-around" }}>
             {selectedAddress ? <Address address={selectedAddress} ensProvider={props.ensProvider} /> : <Spin />}
-            <div style={{ float: "right", paddingRight: 25 }}>
-              <Balance address={selectedAddress} provider={props.provider} dollarMultiplier={props.price} />
-            </div>
+            <Balance address={selectedAddress} provider={props.provider} dollarMultiplier={props.price} />
           </div>
         }
         onOk={() => {
+          setQr();
+          setPK();
           setOpen(!open);
         }}
         onCancel={() => {
+          setQr();
+          setPK();
           setOpen(!open);
         }}
         footer={[
@@ -564,12 +316,28 @@ export default function Wallet(props) {
           <Button
             key="submit"
             type="primary"
+            disabled={!amount || !toAddress || qr}
             loading={false}
             onClick={() => {
+              const tx = Transactor(props.signer || props.provider);
+
+              let value;
+              try {
+                value = ethers.utils.parseEther("" + amount);
+              } catch (e) {
+                // failed to parseEther, try something else
+                value = ethers.utils.parseEther("" + parseFloat(amount).toFixed(8));
+              }
+
+              tx({
+                to: toAddress,
+                value,
+              });
               setOpen(!open);
+              setQr();
             }}
           >
-            Hide
+            <SendOutlined /> Send
           </Button>,
         ]}
       >

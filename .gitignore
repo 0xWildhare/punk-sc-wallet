@@ -13,10 +13,8 @@ packages/react-app/src/contracts/*
 !packages/react-app/src/contracts/external_contracts.js
 packages/hardhat/cache*
 packages/**/data
-!packages/react-app/src/contracts/external_contracts.js
 !packages/react-app/src/contracts/contracts.js
-!packages/react-app/src/contracts/ERC20.json
-!packages/react-app/src/contracts/scWallet2.json
+
 
 # ts
 packages/hardhat-ts/cache

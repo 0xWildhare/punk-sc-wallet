@@ -1,7 +1,3 @@
-import { RetweetOutlined, SettingOutlined } from "@ant-design/icons";
-import { formatUnits, parseUnits } from "@ethersproject/units";
-import { ChainId, Fetcher, Percent, Token, TokenAmount, Trade, WETH } from "@uniswap/sdk";
-import { abi as IUniswapV2Router02ABI } from "@uniswap/v2-periphery/build/IUniswapV2Router02.json";
 import {
   Button,
   Card,
@@ -17,9 +13,13 @@ import {
   Tooltip,
   Typography,
 } from "antd";
-import { useBlockNumber, usePoller } from "eth-hooks";
-import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
+import { ethers } from "ethers";
+import { useBlockNumber, usePoller } from "eth-hooks";
+import { RetweetOutlined, SettingOutlined } from "@ant-design/icons";
+import { ChainId, Fetcher, Percent, Token, TokenAmount, Trade, WETH } from "@uniswap/sdk";
+import { abi as IUniswapV2Router02ABI } from "@uniswap/v2-periphery/build/IUniswapV2Router02.json";
+
 import { useDebounce } from "../hooks";
 
 const { Option } = Select;
@@ -46,6 +46,7 @@ const makeCall = async (callName, contract, args, metadata = {}) => {
     return result;
   }
   console.log("no call of that name!");
+  return undefined;
 };
 
 const defaultToken = "ETH";
@@ -81,9 +82,7 @@ function Swap({ selectedProvider, tokenListURI }) {
   const [swapModalVisible, setSwapModalVisible] = useState(false);
 
   const [tokenList, setTokenList] = useState([]);
-
   const [tokens, setTokens] = useState();
-
   const [invertPrice, setInvertPrice] = useState(false);
 
   const blockNumber = useBlockNumber(selectedProvider, 3000);
@@ -102,8 +101,8 @@ function Swap({ selectedProvider, tokenListURI }) {
     const getTokenList = async () => {
       console.log(_tokenListUri);
       try {
-        const tokenList = await fetch(_tokenListUri);
-        const tokenListJson = await tokenList.json();
+        const tokenListResponse = await fetch(_tokenListUri);
+        const tokenListJson = await tokenListResponse.json();
         const filteredTokens = tokenListJson.tokens.filter(function (t) {
           return t.chainId === activeChainId;
         });
@@ -121,7 +120,7 @@ function Swap({ selectedProvider, tokenListURI }) {
       }
     };
     getTokenList();
-  }, [tokenListURI]);
+  }, [tokenListURI, _tokenListUri, activeChainId]);
 
   const getTrades = async () => {
     if (tokenIn && tokenOut && (amountIn || amountOut)) {
@@ -150,7 +149,7 @@ function Swap({ selectedProvider, tokenListURI }) {
         setAmountInMax();
         bestTrade = Trade.bestTradeExactIn(
           listOfPairs.filter(item => item),
-          new TokenAmount(tokens[tokenIn], parseUnits(amountIn.toString(), tokens[tokenIn].decimals)),
+          new TokenAmount(tokens[tokenIn], ethers.utils.parseUnits(amountIn.toString(), tokens[tokenIn].decimals)),
           tokens[tokenOut],
           { maxNumResults: 3, maxHops: 1 },
         );
@@ -164,7 +163,7 @@ function Swap({ selectedProvider, tokenListURI }) {
         bestTrade = Trade.bestTradeExactOut(
           listOfPairs.filter(item => item),
           tokens[tokenIn],
-          new TokenAmount(tokens[tokenOut], parseUnits(amountOut.toString(), tokens[tokenOut].decimals)),
+          new TokenAmount(tokens[tokenOut], ethers.utils.parseUnits(amountOut.toString(), tokens[tokenOut].decimals)),
           { maxNumResults: 3, maxHops: 1 },
         );
         if (bestTrade[0]) {
@@ -182,6 +181,7 @@ function Swap({ selectedProvider, tokenListURI }) {
 
   useEffect(() => {
     getTrades();
+    // eslint-disable-next-line
   }, [tokenIn, tokenOut, debouncedAmountIn, debouncedAmountOut, slippageTolerance, selectedProvider]);
 
   useEffect(() => {
@@ -192,7 +192,7 @@ function Swap({ selectedProvider, tokenListURI }) {
         setAmountInMax(trades[0].maximumAmountIn(slippageTolerance));
       }
     }
-  }, [slippageTolerance, amountIn, amountOut, trades]);
+  }, [slippageTolerance, amountIn, amountOut, trades, exact]);
 
   const getBalance = async (_token, _account, _contract) => {
     let newBalance;
@@ -260,7 +260,7 @@ function Swap({ selectedProvider, tokenListURI }) {
   const approveRouter = async () => {
     const approvalAmount =
       exact === "in"
-        ? ethers.utils.hexlify(parseUnits(amountIn.toString(), tokens[tokenIn].decimals))
+        ? ethers.utils.hexlify(ethers.utils.parseUnits(amountIn.toString(), tokens[tokenIn].decimals))
         : amountInMax.raw.toString();
     console.log(approvalAmount);
     const approval = updateRouterAllowance(approvalAmount);
@@ -300,7 +300,7 @@ function Swap({ selectedProvider, tokenListURI }) {
       const address = accountList[0];
 
       if (exact === "in") {
-        const _amountIn = ethers.utils.hexlify(parseUnits(amountIn.toString(), tokens[tokenIn].decimals));
+        const _amountIn = ethers.utils.hexlify(ethers.utils.parseUnits(amountIn.toString(), tokens[tokenIn].decimals));
         const _amountOutMin = ethers.utils.hexlify(ethers.BigNumber.from(amountOutMin.raw.toString()));
         if (tokenIn === "ETH") {
           call = "swapExactETHForTokens";
@@ -311,7 +311,9 @@ function Swap({ selectedProvider, tokenListURI }) {
           args = [_amountIn, _amountOutMin, path, address, deadline];
         }
       } else if (exact === "out") {
-        const _amountOut = ethers.utils.hexlify(parseUnits(amountOut.toString(), tokens[tokenOut].decimals));
+        const _amountOut = ethers.utils.hexlify(
+          ethers.utils.parseUnits(amountOut.toString(), tokens[tokenOut].decimals),
+        );
         const _amountInMax = ethers.utils.hexlify(ethers.BigNumber.from(amountInMax.raw.toString()));
         if (tokenIn === "ETH") {
           call = "swapETHForExactTokens";
@@ -359,19 +361,19 @@ function Swap({ selectedProvider, tokenListURI }) {
   };
 
   const insufficientBalance = balanceIn
-    ? parseFloat(formatUnits(balanceIn, tokens[tokenIn].decimals)) < amountIn
+    ? parseFloat(ethers.utils.formatUnits(balanceIn, tokens[tokenIn].decimals)) < amountIn
     : null;
   const inputIsToken = tokenIn !== "ETH";
   const insufficientAllowance = !inputIsToken
     ? false
     : routerAllowance
-    ? parseFloat(formatUnits(routerAllowance, tokens[tokenIn].decimals)) < amountIn
+    ? parseFloat(ethers.utils.formatUnits(routerAllowance, tokens[tokenIn].decimals)) < amountIn
     : null;
   const formattedBalanceIn = balanceIn
-    ? parseFloat(formatUnits(balanceIn, tokens[tokenIn].decimals)).toPrecision(6)
+    ? parseFloat(ethers.utils.formatUnits(balanceIn, tokens[tokenIn].decimals)).toPrecision(6)
     : null;
   const formattedBalanceOut = balanceOut
-    ? parseFloat(formatUnits(balanceOut, tokens[tokenOut].decimals)).toPrecision(6)
+    ? parseFloat(ethers.utils.formatUnits(balanceOut, tokens[tokenOut].decimals)).toPrecision(6)
     : null;
 
   const metaIn =
@@ -488,7 +490,7 @@ function Swap({ selectedProvider, tokenListURI }) {
                   type="link"
                   onClick={() => {
                     setAmountOut();
-                    setAmountIn(formatUnits(balanceIn, tokens[tokenIn].decimals));
+                    setAmountIn(ethers.utils.formatUnits(balanceIn, tokens[tokenIn].decimals));
                     setAmountOutMin();
                     setAmountInMax();
                     setExact("in");
@@ -638,7 +640,7 @@ function Swap({ selectedProvider, tokenListURI }) {
           <Descriptions.Item label="blockNumber">{blockNumber}</Descriptions.Item>
           <Descriptions.Item label="routerAllowance">
             <Space>
-              {routerAllowance ? formatUnits(routerAllowance, tokens[tokenIn].decimals) : null}
+              {routerAllowance ? ethers.utils.formatUnits(routerAllowance, tokens[tokenIn].decimals) : null}
               {routerAllowance > 0 ? <Button onClick={removeRouterAllowance}>Remove Allowance</Button> : null}
             </Space>
           </Descriptions.Item>

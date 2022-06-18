@@ -1,10 +1,9 @@
-/* eslint-disable jsx-a11y/accessible-emoji */
-
-import { formatEther } from "@ethersproject/units";
 import { Select } from "antd";
 import React, { useState } from "react";
+import { utils } from "ethers";
+
+import { useTokenList } from "eth-hooks/dapps/dex";
 import { Address, AddressInput } from "../components";
-import { useTokenList } from "../hooks";
 
 const { Option } = Select;
 
@@ -94,7 +93,7 @@ export default function Hints({ yourLocalBalance, mainnetProvider, price, addres
         >
           useBalance()
         </span>{" "}
-        hook keeps track of your balance: <b>{formatEther(yourLocalBalance || 0)}</b>
+        hook keeps track of your balance: <b>{utils.formatEther(yourLocalBalance || 0)}</b>
       </div>
 
       <div style={{ margin: 8 }}>
@@ -115,7 +114,7 @@ export default function Hints({ yourLocalBalance, mainnetProvider, price, addres
           optionFilterProp="children"
         >
           {listOfTokens.map(token => (
-            <Option key={token.symbol} value={token.symbol}>
+            <Option key={token.address + "_" + token.symbol} value={token.symbol}>
               {token.symbol}
             </Option>
           ))}
@@ -199,9 +198,10 @@ export default function Hints({ yourLocalBalance, mainnetProvider, price, addres
         >
           packages/hardhat
         </span>
-        <div className="highlight" style={{ marginTop: 8 }}>
+        <div style={{ marginTop: 8 }}>
           (use{" "}
           <span
+            className="highlight"
             style={{
               marginLeft: 4,
               /* backgroundColor: "#f1f1f1", */ padding: 4,
@@ -264,7 +264,7 @@ export default function Hints({ yourLocalBalance, mainnetProvider, price, addres
         </span>
       </div>
       <div style={{ padding: 128 }}>
-        🛠 Check out your browser&apos;s developer console for more... (inpect -&gt console) 🚀
+        🛠 Check out your browser&apos;s developer console for more... (inspect console) 🚀
       </div>
     </div>
   );

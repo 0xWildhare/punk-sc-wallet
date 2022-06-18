@@ -32,7 +32,7 @@ const zero = BigNumber.from(0);
 **/
 
 export default function Balance(props) {
-  const [dollarMode, setDollarMode] = useState(false);
+  const [dollarMode, setDollarMode] = useState(true);
   const [balance, setBalance] = useState();
   const {provider, address} = props;
 
@@ -65,7 +65,7 @@ export default function Balance(props) {
     floatBalance = parseFloat(etherBalance);
   }
 
-  let displayBalance = floatBalance.toFixed(3);
+  let displayBalance = floatBalance.toFixed(4);
 
   const price = props.price || props.dollarMultiplier || 1;
 
@@ -78,7 +78,7 @@ export default function Balance(props) {
       style={{
         verticalAlign: "middle",
         fontSize: props.size ? props.size : 24,
-        padding: 8,
+        padding: "0 0.5rem",
         cursor: "pointer",
       }}
       onClick={() => {

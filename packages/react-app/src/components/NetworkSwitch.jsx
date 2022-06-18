@@ -1,33 +1,28 @@
 import React from "react";
-import { Select } from "antd";
+import { Dropdown, Menu, Button } from "antd";
 
-function NetworkSwitch({ NETWORKS, targetNetwork }) {
-  const options = [];
-  for (const id in NETWORKS) {
-    options.push(
-      <Select.Option key={id} value={NETWORKS[id].name}>
-        <span style={{ color: NETWORKS[id].color, fontSize: 24 }}>{NETWORKS[id].name}</span>
-      </Select.Option>,
-    );
-  }
+function NetworkSwitch({ networkOptions, selectedNetwork, setSelectedNetwork }) {
+  const menu = (
+    <Menu>
+      {networkOptions
+        .filter(i => i !== selectedNetwork)
+        .map(i => (
+          <Menu.Item key={i}>
+            <Button type="text" onClick={() => setSelectedNetwork(i)}>
+              <span style={{ textTransform: "capitalize" }}>{i}</span>
+            </Button>
+          </Menu.Item>
+        ))}
+    </Menu>
+  );
 
   return (
-    <Select
-      defaultValue={targetNetwork.name}
-      style={{ textAlign: "left", width: 170, fontSize: 20, paddingLeft: 10 }}
-      onChange={value => {
-        if (targetNetwork.chainId != NETWORKS[value].chainId) {
-          window.localStorage.setItem("network", value);
-          setTimeout(() => {
-            window.location.reload();
-          }, 1);
-        }
-      }}
-    >
-      {options}
-    </Select>
+    <div>
+      <Dropdown.Button overlay={menu} placement="bottomRight" trigger={["click"]}>
+        <span style={{ textTransform: "capitalize" }}>{selectedNetwork}</span>
+      </Dropdown.Button>
+    </div>
   );
 }
-
 
 export default NetworkSwitch;

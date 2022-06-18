@@ -1,11 +1,11 @@
-import { DollarCircleOutlined } from "@ant-design/icons";
-import { RampInstantSDK } from "@ramp-network/ramp-instant-sdk";
 import { Button, Divider, Modal } from "antd";
 import React, { useState } from "react";
+import { DollarCircleOutlined } from "@ant-design/icons";
+import { RampInstantSDK } from "@ramp-network/ramp-instant-sdk";
 
 // added display of 0 if price={price} is not provided
 
-/*
+/**
   ~ What it does? ~
 
   Displays current ETH price and gives options to buy ETH through Wyre/Ramp/Coinbase
@@ -23,7 +23,7 @@ import React, { useState } from "react";
   - Ramp opens directly in the application, component uses RampInstantSDK
   - Provide price={price} and current ETH price will be displayed
   - Provide address={address} and your address will be pasted into Wyre/Ramp instantly
-*/
+**/
 
 export default function Ramp(props) {
   const [modalUp, setModalUp] = useState("down");
@@ -61,7 +61,7 @@ export default function Ramp(props) {
         }}
       >
         <DollarCircleOutlined style={{ color: "#52c41a" }} />{" "}
-        {typeof props.price === "undefined" ? 0 : props.price.toFixed(2)}
+        {typeof props.price === "undefined" ? 0 : props.price && props.price.toFixed && props.price.toFixed(2)}
       </Button>
       <Modal
         title="Buy ETH"
