@@ -40,7 +40,7 @@ import {
 import { Home, Hints, } from "./views"
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
-import { useExchangePrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
+import { useExchangePrice, useLocalStorage, usePoller, useUserProvider, useStaticJsonRPC } from "./hooks";
 import ERC20 from "./contracts/ERC20.json";
 import scWallet2 from "./contracts/scWallet2.json";
 import deployedContracts from "./contracts/hardhat_contracts.json";
@@ -82,9 +82,8 @@ const initialNetwork = NETWORKS.localhost;
 /// 📡 What chain are your contracts deployed to?
 const cachedNetwork = window.localStorage.getItem("network");
 let targetNetwork = NETWORKS[cachedNetwork || "localhost"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
-if (!targetNetwork) {
-  targetNetwork = NETWORKS.xdai;
-}
+if(!targetNetwork) targetNetwork = NETWORKS["localhost"];
+
 // 😬 Sorry for all the console logging
 const DEBUG = true;
 const NETWORKCHECK = true;
@@ -100,16 +99,14 @@ if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 //
 // attempt to connect to our own scaffold eth rpc and if that fails fall back to infura...
 // Using StaticJsonRpcProvider as the chainId won't change see https://github.com/ethers-io/ethers.js/issues/901
-const scaffoldEthProvider = new StaticJsonRpcProvider("https://rpc.scaffoldeth.io:48544");
+const providers = [
+  "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
+  `https://mainnet.infura.io/v3/${INFURA_ID}`,
+  "https://rpc.scaffoldeth.io:48544",
+];
 //const mainnetInfura = new StaticJsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID);
 // ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_I
 
-// 🏠 Your local provider is usually pointed at your local blockchain
-const localProviderUrl = targetNetwork.rpcUrl;
-// as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
-const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
-if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
-let localProvider = new StaticJsonRpcProvider(localProviderUrlFromEnv);
 
 
 // 🔭 block explorer URL
@@ -165,6 +162,11 @@ function App(props) {
     }
     waitForNetwork()
   },[ localProvider ])*/
+  // 🏠 Your local provider is usually pointed at your local blockchain
+  const localProvider = useStaticJsonRPC([
+    process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : targetNetwork.rpcUrl,
+  ]);
+  const mainnetProvider = useStaticJsonRPC(providers);
 
 
   const [checkingBalances, setCheckingBalances] = useState();
@@ -202,7 +204,7 @@ function App(props) {
 
   };
 
-  const mainnetProvider = scaffoldEthProvider //scaffoldEthProvider && scaffoldEthProvider._network ?  : mainnetInfura;
+  //const mainnetProvider = scaffoldEthProvider //scaffoldEthProvider && scaffoldEthProvider._network ?  : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
@@ -236,7 +238,7 @@ function App(props) {
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProvider = useUserProvider(injectedProvider, localProvider);
   //const address = useUserAddress(userProvider);
-
+console.log("userProvider", userProvider)
   // You can warn the user if you would like them to be on a specific network
   const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
   //const selectedChainId = userProvider && userProvider._network && userProvider._network.chainId;
@@ -279,9 +281,11 @@ function App(props) {
   const readContracts = useContractLoader(localProvider, contractConfig);
   if (DEBUG) console.log("readContracts: ", readContracts)
 
+
+
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
-console.log("writeContracts: ", writeContracts);
+  console.log("writeContracts: ", writeContracts);
 
   // Faucet Tx can be used to send funds from the faucet
   const faucetTx = Transactor(localProvider, gasPrice);
@@ -720,14 +724,15 @@ console.log("writeContracts: ", writeContracts);
   const contractName = "ScWallet";
   const contractAddress = readContracts?.ScWallet?.address;
 
+  const [scWallets, setScWallets] = useState([]);
+  const [currentScWalletAddress, setCurrentScWalletAddress] = useState();
+
   //📟 Listen for broadcast events
-//TODO: why tf isn't this working on roopsten? (also does not work for rinkeby)
+  //TODO: why tf isn't this working on roopsten? (also does not work for rinkeby)
   // ScWalletFactory Events:    Listens for a new sc wallet
   const ownersScWalletEvents = useEventListener(readContracts, "ScWalletFactory", "Owners", localProvider, 1);
   if(DEBUG) console.log("📟 ownersScWalletEvents:", ownersScWalletEvents, readContracts, localProvider);
 
-  const [scWallets, setScWallets] = useState([]);
-  const [currentScWalletAddress, setCurrentScWalletAddress] = useState();
 
   useEffect(() => {
     if (address) {
@@ -882,8 +887,8 @@ console.log("writeContracts: ", writeContracts);
 
       <div style={{ padding: 16, width: 420, margin: "auto" }}>
         <SpeedUpTransactions
-           provider={userProvider}
-           signer={userProvider.getSigner()}
+           provider={userProviderAndSigner.provider}
+           signer={userSigner}
            injectedProvider={injectedProvider}
            address={address}
            chainId={targetNetwork.chainId}
