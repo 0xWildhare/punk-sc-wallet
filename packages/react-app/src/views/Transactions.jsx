@@ -33,7 +33,7 @@ export default function Transactions({
         poolServerUrl + readContracts[contractName].address + "_" + localProvider._network.chainId,
       );
 
-      console.log("backend stuff res", res.data);
+      console.log("backend stuff res transaction", res, "res.data", res.data);
 
       const newTransactions = [];
       for (const i in res.data) {

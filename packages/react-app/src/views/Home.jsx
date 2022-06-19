@@ -23,8 +23,8 @@ export default function Home({
 }) {
   return (
     <>
-      <div style={{ padding: 32, maxWidth: 850, margin: "auto" }}>
-        <div style={{ paddingBottom: 32 }}>
+      <div style={{ padding: 24, maxWidth: 850, margin: "auto" }}>
+        <div style={{ paddingBottom: 16 }}>
           <div>
             <Balance
               address={contractAddress ? contractAddress : ""}

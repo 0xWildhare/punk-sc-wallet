@@ -18,7 +18,7 @@ export default function TransactionDetailsModal({visible, handleOk, handleCancel
           Cancel
         </Button>,
         <Button key="ok" type="primary" onClick={handleOk}>
-          Propose
+          Send
         </Button>,
       ] : null}
     >

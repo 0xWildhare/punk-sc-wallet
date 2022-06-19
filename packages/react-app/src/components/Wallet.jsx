@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react";
 import { Blockie } from ".";
 import Address from "./Address";
 import Balance from "./Balance";
+import WalletStandard from "./WalletStandard";
 import QRPunkBlockie from "./QRPunkBlockie";
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
@@ -546,10 +547,23 @@ export default function Wallet(props) {
         visible={open}
         title={
           <div>
-            {selectedAddress ? <Address address={selectedAddress} ensProvider={props.ensProvider} /> : <Spin />}
-            <div style={{ float: "right", paddingRight: 25 }}>
+
+            <div style={{ float: "right", paddingRight: 30 }}>
+              <WalletStandard
+                address={props.address}
+                provider={props.provider}
+                signer={props.signer}
+                ensProvider={props.ensProvider}
+                price={props.price}
+                color={props.color === "light" ? "#1890ff" : "#2caad9"}
+                size={"1.4rem"}
+                padding={"0px"}
+              />
               <Balance address={selectedAddress} provider={props.provider} dollarMultiplier={props.price} />
             </div>
+            {selectedAddress ? <Address address={selectedAddress} ensProvider={props.ensProvider} /> : <Spin />}
+
+
           </div>
         }
         onOk={() => {
@@ -558,6 +572,7 @@ export default function Wallet(props) {
         onCancel={() => {
           setOpen(!open);
         }}
+
         footer={[
           privateKeyButton,
           receiveButton,
@@ -575,6 +590,7 @@ export default function Wallet(props) {
       >
         {display}
       </Modal>
+
     </span>
   );
 }

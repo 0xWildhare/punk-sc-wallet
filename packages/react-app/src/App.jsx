@@ -154,7 +154,7 @@ function App(props) {
   // const [readContracts, setReadContracts] = useState(readContractsSetup);
 
   const contractName = "MultiSigWallet";
-  const contractAddress = readContracts?.MultiSigWallet?.address;
+  //const contractAddress = readContracts?.MultiSigWallet?.address;
 
   //📟 Listen for broadcast events
 
@@ -434,9 +434,7 @@ function App(props) {
         <Menu.Item key="/">
           <Link to="/">home</Link>
         </Menu.Item>
-        <Menu.Item key="/create">
-          <Link to="/create">Propose Transaction</Link>
-        </Menu.Item>
+
         <Menu.Item key="/pool">
           <Link to="/pool">Pool</Link>
         </Menu.Item>
@@ -462,37 +460,42 @@ function App(props) {
               </Col>
             </Row>
           ) : (
-            <Home
-              contractAddress={currentMultiSigAddress}
-              localProvider={localProvider}
-              price={price}
-              mainnetProvider={mainnetProvider}
-              blockExplorer={blockExplorer}
-              executeTransactionEvents={executeTransactionEvents}
-              contractName={contractName}
-              readContracts={readContracts}
-              ownerEvents={ownerEvents}
-              signaturesRequired={signaturesRequired}
-            />
+            <div>
+              <Home
+                contractAddress={currentMultiSigAddress}
+                localProvider={localProvider}
+                price={price}
+                mainnetProvider={mainnetProvider}
+                blockExplorer={blockExplorer}
+                executeTransactionEvents={executeTransactionEvents}
+                contractName={contractName}
+                readContracts={readContracts}
+                ownerEvents={ownerEvents}
+                signaturesRequired={signaturesRequired}
+              />
+              <CreateTransaction
+                poolServerUrl={BACKEND_URL}
+                contractName={contractName}
+                contractAddress={currentMultiSigAddress}
+                mainnetProvider={mainnetProvider}
+                localProvider={localProvider}
+                price={price}
+                tx={tx}
+                readContracts={readContracts}
+                userSigner={userSigner}
+                DEBUG={DEBUG}
+                nonce={nonce}
+                blockExplorer={blockExplorer}
+                signaturesRequired={signaturesRequired}
+                tx={tx}
+                writeContracts={writeContracts}
+              />
+            </div>
           )}
         </Route>
-        <Route path="/create">
-          <CreateTransaction
-            poolServerUrl={BACKEND_URL}
-            contractName={contractName}
-            contractAddress={contractAddress}
-            mainnetProvider={mainnetProvider}
-            localProvider={localProvider}
-            price={price}
-            tx={tx}
-            readContracts={readContracts}
-            userSigner={userSigner}
-            DEBUG={DEBUG}
-            nonce={nonce}
-            blockExplorer={blockExplorer}
-            signaturesRequired={signaturesRequired}
-          />
-        </Route>
+
+
+
         <Route path="/pool">
           <Transactions
             poolServerUrl={BACKEND_URL}

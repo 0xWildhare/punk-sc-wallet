@@ -80,6 +80,7 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
     //
     connector.on("call_request", (error, payload) => {
       if (error) {
+        console.log("this_error", error);
         throw error;
       }
 
@@ -143,6 +144,7 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
   //
 
   useEffect(() => {
+    console.log("data", data, "to", to)
     if (data && to) {
       decodeFunctionData();
     }
@@ -155,7 +157,7 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
       setParsedTransactionData(parsedTransactionData);
       setIsModalVisible(true);
     } catch (error) {
-      console.log(error);
+      console.log("am I here", error);
       setParsedTransactionData(null);
     }
   };
@@ -187,6 +189,7 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
       to,
       value,
     });
+    hideModal();
   };
 
   const resetConnection = () => {
