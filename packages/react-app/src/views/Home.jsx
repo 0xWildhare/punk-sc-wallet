@@ -1,5 +1,11 @@
 import React from "react";
-import { Balance, Address, TransactionListItem, Owners } from "../components";
+import {
+  Balance,
+  Address,
+  TransactionListItem,
+  Owners,
+  QRPunkBlockie,
+ } from "../components";
 import QR from "qrcode.react";
 import { List, Button } from "antd";
 
@@ -27,34 +33,27 @@ export default function Home({
               size={64}
             />
           </div>
-          <div>
-            <QR
-              value={contractAddress ? contractAddress.toString() : ""}
-              size="180"
-              level="H"
-              includeMargin
-              renderAs="svg"
-              imageSettings={{ excavate: false }}
+          <div style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
+            <QRPunkBlockie
+              withQr
+              address={contractAddress}
+              showAddress={true}
             />
           </div>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <Address
-              address={contractAddress ? contractAddress : ""}
-              ensProvider={mainnetProvider}
-              blockExplorer={blockExplorer}
-              fontSize={32}
-            />
-          </div>
+
         </div>
+        {/* Maybe this goes on another page
         <div style={{padding:32}}>
-        <Owners ownerEvents={ownerEvents} signaturesRequired={signaturesRequired} mainnetProvider={mainnetProvider} blockExplorer={blockExplorer} />
-        </div>
-        <div style={{padding:64}}>
-        <Button type={"primary"} onClick={()=>{
-          window.location = "/create"
-        }}>Propose Transaction</Button>
-        </div>
-        <List
+          <Owners
+            ownerEvents={ownerEvents}
+            signaturesRequired={signaturesRequired}
+            mainnetProvider={mainnetProvider}
+            blockExplorer={blockExplorer}
+          />
+        </div>*/}
+
+        {/* Also probably for another page
+          <List
           bordered
           dataSource={executeTransactionEvents}
           renderItem={item => {
@@ -69,7 +68,7 @@ export default function Home({
               />
             );
           }}
-        />
+        />*/}
       </div>
 
 
