@@ -40,7 +40,7 @@ contract MultiSigWallet {
     _;
   }
 
-  constructor(uint256 _chainId, address[] memory _owners, address _burner, uint _signaturesRequired, address _factory) payable requireNonZeroSignatures(_signaturesRequired) {
+  constructor(uint256 _chainId, address _burner, address[] memory _owners, uint _signaturesRequired, address _factory) payable requireNonZeroSignatures(_signaturesRequired) {
     multiSigFactory = MultiSigFactory(_factory);
     signaturesRequired = _signaturesRequired;
 		burner = _burner;

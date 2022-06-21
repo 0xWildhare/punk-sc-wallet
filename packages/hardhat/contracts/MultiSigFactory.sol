@@ -11,12 +11,14 @@ contract MultiSigFactory {
     uint indexed contractId,
     address indexed contractAddress,
     address creator,
+    address burner,
     address[] owners,
     uint signaturesRequired
   );
 
   event Owners(
     address indexed contractAddress,
+    address burner,
     address[] owners,
     uint256 indexed signaturesRequired
   );
@@ -39,6 +41,7 @@ contract MultiSigFactory {
 
   function create(
     uint256 _chainId,
+    address burner,
     address[] memory _owners,
     uint _signaturesRequired
   ) public payable {

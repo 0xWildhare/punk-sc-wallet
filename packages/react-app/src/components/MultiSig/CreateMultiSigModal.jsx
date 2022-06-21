@@ -26,12 +26,17 @@ export default function CreateMultiSigModal({
   const [signaturesRequired, setSignaturesRequired] = useState(false);
   const [amount, setAmount] = useState("0");
   const [owners, setOwners] = useState([""]);
+  const [burner, setBurner] = useState("");
 
   useEffect(() => {
     if (address) {
-      setOwners([address, ""]);
+      setBurner(address);
     }
   }, [address]);
+
+  const updateBurner = (value) => {
+    setBurner(value)
+  }
 
   const showCreateModal = () => {
     setIsCreateModalVisible(true);
@@ -195,25 +200,37 @@ export default function CreateMultiSigModal({
             onChange={addMultipleAddress}
             value={multipleAddress}
           /> */}
-
-          {owners.map((owner, index) => (
-            <div key={index} style={{ display: "flex", gap: "1rem" }}>
-              <div style={{ width: "90%" }}>
+          <div style={{ width: "90%" }}>
+            Burner
+            <AddressInput
+              autoFocus
+              ensProvider={mainnetProvider}
+              placeholder={"Owner address"}
+              value={burner}
+              onChange={val => updateBurner(val)}
+            />
+          </div>
+          <div>
+            Owner(s)
+            {owners.map((owner, index) => (
+              <div key={index} style={{ display: "flex", gap: "1rem" }}>
+                <div style={{ width: "90%" }}>
                 <AddressInput
-                  autoFocus
-                  ensProvider={mainnetProvider}
-                  placeholder={"Owner address"}
-                  value={owner}
-                  onChange={val => updateOwner(val, index)}
-                />
+                    autoFocus
+                    ensProvider={mainnetProvider}
+                    placeholder={"Owner address"}
+                    value={owner}
+                    onChange={val => updateOwner(val, index)}
+                  />
+                </div>
+                {index > 0 && (
+                  <Button style={{ padding: "0 0.5rem" }} danger onClick={() => removeOwnerField(index)}>
+                    <DeleteOutlined />
+                  </Button>
+                )}
               </div>
-              {index > 0 && (
-                <Button style={{ padding: "0 0.5rem" }} danger onClick={() => removeOwnerField(index)}>
-                  <DeleteOutlined />
-                </Button>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
           <div style={{ display: "flex", justifyContent: "flex-end", width: "90%" }}>
             <Button onClick={addOwnerField}>
               <PlusOutlined />
