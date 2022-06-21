@@ -2,10 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { Button, Input, Select, InputNumber, Space, Tooltip } from "antd";
 import { CodeOutlined } from '@ant-design/icons';
-import { AddressInput, EtherInput, WalletConnectInput } from "../components";
-import TransactionDetailsModal from "../components/MultiSig/TransactionDetailsModal";
-import { parseExternalContractTransaction } from "../helpers";
-import { useLocalStorage } from "../hooks";
+import { AddressInput, EtherInput, WalletConnectInput } from "../";
+import TransactionDetailsModal from "./TransactionDetailsModal";
+import { parseExternalContractTransaction } from "../../helpers";
+import { useLocalStorage } from "../../hooks";
 import { ethers } from "ethers";
 import { parseEther } from "@ethersproject/units";
 const { Option } = Select;
@@ -187,7 +187,7 @@ export default function CreateTransaction({
   return (
     <div>
 
-      <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 8 }}>
+      <div style={{ border: "1px solid #cccccc", padding: 16, width: 420, margin: "auto", marginTop: 8 }}>
         <div style={{ margin: 8 }}>
           <div style={{ margin: 8, padding: 8 }}>
             <Select value={methodName} style={{ width: "100%" }} onChange={setMethodName}>

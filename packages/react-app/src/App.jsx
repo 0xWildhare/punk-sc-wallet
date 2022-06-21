@@ -26,6 +26,7 @@ import {
   NetworkSwitch,
   CreateMultiSigModal,
   ImportMultiSigModal,
+  CreateTransaction
 } from "./components";
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
@@ -33,7 +34,7 @@ import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { Home, Hints, Subgraph, CreateTransaction, Transactions } from "./views";
+import { Home, Hints, Subgraph, Transactions } from "./views";
 import { useStaticJsonRPC, useLocalStorage } from "./hooks";
 
 import Multisig from "./contracts/Multisig.json";
@@ -472,24 +473,14 @@ function App(props) {
                 readContracts={readContracts}
                 ownerEvents={ownerEvents}
                 signaturesRequired={signaturesRequired}
-              />
-              <CreateTransaction
                 poolServerUrl={BACKEND_URL}
-                contractName={contractName}
-                contractAddress={currentMultiSigAddress}
-                mainnetProvider={mainnetProvider}
-                localProvider={localProvider}
-                price={price}
                 tx={tx}
-                readContracts={readContracts}
                 userSigner={userSigner}
                 DEBUG={DEBUG}
                 nonce={nonce}
-                blockExplorer={blockExplorer}
-                signaturesRequired={signaturesRequired}
-                tx={tx}
                 writeContracts={writeContracts}
               />
+
             </div>
           )}
         </Route>

@@ -5,6 +5,7 @@ import {
   TransactionListItem,
   Owners,
   QRPunkBlockie,
+  CreateTransaction
  } from "../components";
 import QR from "qrcode.react";
 import { List, Button } from "antd";
@@ -20,6 +21,12 @@ export default function Home({
   readContracts,
   ownerEvents,
   signaturesRequired,
+  poolServerUrl,
+  tx,
+  userSigner,
+  DEBUG,
+  nonce,
+  writeContracts,
 }) {
   return (
     <>
@@ -40,7 +47,25 @@ export default function Home({
               showAddress={true}
             />
           </div>
-
+          <div style={{ paddingTop: 42, paddingBottom: 69 }}>
+          <CreateTransaction
+            poolServerUrl={poolServerUrl}
+            contractName={contractName}
+            contractAddress={contractAddress}
+            mainnetProvider={mainnetProvider}
+            localProvider={localProvider}
+            price={price}
+            tx={tx}
+            readContracts={readContracts}
+            userSigner={userSigner}
+            DEBUG={DEBUG}
+            nonce={nonce}
+            blockExplorer={blockExplorer}
+            signaturesRequired={signaturesRequired}
+            tx={tx}
+            writeContracts={writeContracts}
+          />
+          </div>
         </div>
         {/* Maybe this goes on another page
         <div style={{padding:32}}>

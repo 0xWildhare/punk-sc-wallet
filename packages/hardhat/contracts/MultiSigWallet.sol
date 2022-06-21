@@ -19,6 +19,8 @@ contract MultiSigWallet {
 
   address[] public owners;
 
+	address public burner;
+
 	uint public signaturesRequired;
 	uint public nonce;
 	uint public chainId;
@@ -38,9 +40,10 @@ contract MultiSigWallet {
     _;
   }
 
-  constructor(uint256 _chainId, address[] memory _owners, uint _signaturesRequired, address _factory) payable requireNonZeroSignatures(_signaturesRequired) {
+  constructor(uint256 _chainId, address[] memory _owners, address _burner, uint _signaturesRequired, address _factory) payable requireNonZeroSignatures(_signaturesRequired) {
     multiSigFactory = MultiSigFactory(_factory);
     signaturesRequired = _signaturesRequired;
+		burner = _burner;
     for (uint i = 0; i < _owners.length; i++) {
       address owner = _owners[i];
 
@@ -109,19 +112,22 @@ contract MultiSigWallet {
 
     nonce++;
 
-    uint256 validSignatures;
-    address duplicateGuard;
-    for (uint i = 0; i < signatures.length; i++) {
-        address recovered = recover(_hash, signatures[i]);
-        require(recovered > duplicateGuard, "executeTransaction: duplicate or unordered signatures");
-        duplicateGuard = recovered;
+	   if(to == address(this)) {
+			uint256 validSignatures;
+	    address duplicateGuard;
+	    for (uint i = 0; i < signatures.length; i++) {
+	        address recovered = recover(_hash, signatures[i]);
+	        require(recovered > duplicateGuard, "executeTransaction: duplicate or unordered signatures");
+	        duplicateGuard = recovered;
 
-        if (isOwner[recovered]) {
-          validSignatures++;
-        }
-    }
-
-    require(validSignatures >= signaturesRequired, "executeTransaction: not enough valid signatures");
+	        if (isOwner[recovered]) {
+	          validSignatures++;
+	        }
+	    }
+	    require(validSignatures >= signaturesRequired, "executeTransaction: not enough valid signatures");
+		} else {
+			require(recover(_hash, signatures[0]) == burner); // can add || isOwner[recovered] to let hard wallet sign also?
+		}
 
     (bool success, bytes memory result) = to.call{value: value}(data);
     require(success, "executeTransaction: tx failed");
