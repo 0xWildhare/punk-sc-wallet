@@ -11,6 +11,11 @@
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "_burner",
+            "type": "address"
+          },
+          {
             "internalType": "address[]",
             "name": "_owners",
             "type": "address[]"
@@ -26,7 +31,7 @@
             "type": "address"
           }
         ],
-        "stateMutability": "nonpayable",
+        "stateMutability": "payable",
         "type": "constructor"
       },
       {
@@ -142,6 +147,19 @@
       },
       {
         "inputs": [],
+        "name": "burner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
         "name": "chainId",
         "outputs": [
           {
@@ -151,19 +169,6 @@
           }
         ],
         "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "string",
-            "name": "jsonString",
-            "type": "string"
-          }
-        ],
-        "name": "createTransaction",
-        "outputs": [],
-        "stateMutability": "nonpayable",
         "type": "function"
       },
       {
@@ -237,25 +242,6 @@
       {
         "inputs": [
           {
-            "internalType": "uint256",
-            "name": "_nonce",
-            "type": "uint256"
-          }
-        ],
-        "name": "getTransactions",
-        "outputs": [
-          {
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
             "internalType": "address",
             "name": "",
             "type": "address"
@@ -308,12 +294,12 @@
         "inputs": [
           {
             "internalType": "bytes32",
-            "name": "hash",
+            "name": "_hash",
             "type": "bytes32"
           },
           {
             "internalType": "bytes",
-            "name": "signature",
+            "name": "_signature",
             "type": "bytes"
           }
         ],
@@ -354,25 +340,6 @@
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "name": "transactions",
-        "outputs": [
-          {
-            "internalType": "string",
-            "name": "",
-            "type": "string"
           }
         ],
         "stateMutability": "view",

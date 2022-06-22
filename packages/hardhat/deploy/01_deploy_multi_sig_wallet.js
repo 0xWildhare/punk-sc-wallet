@@ -21,7 +21,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   await deploy("MultiSigWallet", {
     from: deployer,
-    args: [chainId, ["0x4e04bfbEa4476Df410c3E9deC7A96bf56Ff9283C"], 1, multiSigFactory_address],
+    args: [chainId, "0x521B2cE927FD6d0D473789Bd3c70B296BBce613e", ["0xa53A6fE2d8Ad977aD926C485343Ba39f32D3A3F6"], 1, multiSigFactory_address],
     log: true,
     waitConfirmations: 5,
   });
@@ -29,9 +29,9 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   // Getting a previously deployed contract
   // const multiSigFactory = await ethers.getContract("MultiSigFactory", deployer);
   /*  await YourContract.setPurpose("Hello");
-  
-    To take ownership of yourContract using the ownable library uncomment next line and add the 
-    address you want to be the owner. 
+
+    To take ownership of yourContract using the ownable library uncomment next line and add the
+    address you want to be the owner.
     // await yourContract.transferOwnership(YOUR_ADDRESS_HERE);
 
     //const yourContract = await ethers.getContractAt('YourContract', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
