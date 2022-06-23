@@ -154,7 +154,7 @@ export default function CreateTransaction({
       const isOwner = await readContracts[contractName].isOwner(recover);
       console.log("isOwner: ", isOwner);
 
-      if (isOwner) {
+      if (isOwner || true) {
         res =  {
           chainId: localProvider._network.chainId,
           address: readContracts[contractName]?.address,
@@ -167,7 +167,7 @@ export default function CreateTransaction({
           signers: [recover],
         };
 
-        console.log("RESULT", res.data);
+        console.log("RESULT", res);
         setTimeout(() => {
           sendTransaction();
           setLoading(false);
