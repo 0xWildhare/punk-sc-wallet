@@ -14,6 +14,7 @@ contract MultiSigWallet {
 	event Deposit(address indexed sender, uint amount, uint balance);
 	event ExecuteTransaction( address indexed owner, address payable to, uint256 value, bytes data, uint256 nonce, bytes32 hash, bytes result);
 	event Owner( address indexed owner, bool added);
+	event Burner( address indexed burner, bool added);
 
 	mapping(address => bool) public isOwner;
 
@@ -44,6 +45,7 @@ contract MultiSigWallet {
     multiSigFactory = MultiSigFactory(_factory);
     signaturesRequired = _signaturesRequired;
 		burner = _burner;
+		emit Burner(burner, true);
     for (uint i = 0; i < _owners.length; i++) {
       address owner = _owners[i];
 

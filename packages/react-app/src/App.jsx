@@ -437,7 +437,7 @@ function App(props) {
         </Menu.Item>
 
         <Menu.Item key="/pool">
-          <Link to="/pool">Pool</Link>
+          <Link to="/pool">Manage Signers</Link>
         </Menu.Item>
       </Menu>
 
@@ -503,6 +503,8 @@ function App(props) {
             blockExplorer={blockExplorer}
             nonce={nonce}
             signaturesRequired={signaturesRequired}
+            contractAddress={currentMultiSigAddress}
+            ownerEvents={ownerEvents}
           />
         </Route>
         <Route exact path="/debug">

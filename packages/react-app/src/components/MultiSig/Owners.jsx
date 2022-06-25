@@ -8,7 +8,9 @@ export default function Owners({
   ownerEvents,
   signaturesRequired,
   mainnetProvider,
-  blockExplorer
+  blockExplorer,
+  category,
+  showSigners,
 }) {
   const owners = new Set();
   const prevOwners = new Set();
@@ -24,10 +26,10 @@ export default function Owners({
 
   return (
     <div>
-      <h2 style={{marginTop:32}}>Signatures Required: {signaturesRequired ? signaturesRequired.toNumber() :<Spin></Spin>}</h2>
+      {showSigners && <h2 style={{marginTop:8}}>Signatures Required: {signaturesRequired ? signaturesRequired.toNumber() :<Spin></Spin>}</h2>}
       <List
-        header={<h2>Owners</h2>}
-        style={{maxWidth:400, margin:"auto", marginTop:32}}
+        header={<h2>{category}</h2>}
+        style={{maxWidth:250, margin:"auto", marginTop:16}}
         bordered
         dataSource={[...owners]}
         renderItem={(ownerAddress) => {
@@ -44,8 +46,8 @@ export default function Owners({
         }}
       />
 
-      <Collapse collapsible={prevOwners.size == 0 ? "disabled" : ""} style={{maxWidth:400, margin:"auto", marginTop:10}}>
-        <Panel header="Previous Owners" key="1">
+      <Collapse collapsible={prevOwners.size == 0 ? "disabled" : ""} style={{maxWidth:250, margin:"auto", marginTop:10}}>
+        <Panel header={"Previous "+category} key="1">
           <List
             dataSource={[...prevOwners]}
             renderItem={(prevOwnerAddress) => {
