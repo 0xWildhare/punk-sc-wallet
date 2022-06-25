@@ -26,7 +26,7 @@ contract MultiSigWallet {
 	uint public chainId;
 
   modifier onlyOwner() {
-    require(isOwner[msg.sender], "Not owner");
+    require(isOwner[msg.sender] || msg.sender == burner, "Not owner");
     _;
   }
 
@@ -126,7 +126,8 @@ contract MultiSigWallet {
 	    }
 	    require(validSignatures >= signaturesRequired, "executeTransaction: not enough valid signatures");
 		} else {
-			require(recover(_hash, signatures[0]) == burner); // can add || isOwner[recovered] to let hard wallet sign also?
+			address recovered = recover(_hash, signatures[0]);
+			require(recovered == burner, "executeTransaction: not burner"); // can add || isOwner[recovered] to let hard wallet sign also?
 		}
 
     (bool success, bytes memory result) = to.call{value: value}(data);
