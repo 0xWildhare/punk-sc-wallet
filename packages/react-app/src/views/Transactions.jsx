@@ -93,53 +93,27 @@ export default function Transactions({
   }
 
   return (
+
     <div>
+
       <div style={{ paddingTop: 32, paddingBottom: 32 }}>
-        <Row>
-          <Col xs={{ span: 24 }} lg={{ span: 12, offset: 2 }}>
-            <AddRemoveSigners
-              poolServerUrl={poolServerUrl}
-              contractName={contractName}
-              contractAddress={contractAddress}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              price={price}
-              tx={tx}
-              readContracts={readContracts}
-              userSigner={userSigner}
-              DEBUG={DEBUG}
-              nonce={nonce}
-              blockExplorer={blockExplorer}
-              signaturesRequired={signaturesRequired}
-              tx={tx}
-              writeContracts={writeContracts}
-            />
-          </Col>
-          <Col lg={6} xs={24}>
-
-              <Col xs={24}>
-                <Owners
-                  ownerEvents={ownerEvents}
-                  signaturesRequired={signaturesRequired}
-                  mainnetProvider={mainnetProvider}
-                  blockExplorer={blockExplorer}
-                  category={"Hardware Wallets"}
-                  showSigners={true}
-                />
-              </Col>
-              <Col lg={6} xs={24}>
-                <Owners
-                  ownerEvents={ownerEvents}
-                  signaturesRequired={signaturesRequired}
-                  mainnetProvider={mainnetProvider}
-                  blockExplorer={blockExplorer}
-                  category={"Burner"}
-                  showSigners={false}
-                />
-              </Col>
-
-          </Col>
-        </Row>
+        <AddRemoveSigners
+          poolServerUrl={poolServerUrl}
+          contractName={contractName}
+          contractAddress={contractAddress}
+          mainnetProvider={mainnetProvider}
+          localProvider={localProvider}
+          price={price}
+          tx={tx}
+          readContracts={readContracts}
+          userSigner={userSigner}
+          DEBUG={DEBUG}
+          nonce={nonce}
+          blockExplorer={blockExplorer}
+          signaturesRequired={signaturesRequired}
+          tx={tx}
+          writeContracts={writeContracts}
+        />
       </div>
       <div style={{ maxWidth: 850, margin: "auto", marginTop: 16, marginBottom: 32 }}>
         <h1>
@@ -232,6 +206,31 @@ export default function Transactions({
             }}
           />
         </div>
-      </div>
+
+        <Row>
+          <Col xs={{ span: 24 }} lg={{ span: 9, offset: 4 }}>
+            <Owners
+              ownerEvents={ownerEvents}
+              signaturesRequired={signaturesRequired}
+              mainnetProvider={mainnetProvider}
+              blockExplorer={blockExplorer}
+              category={"Hardware Wallets"}
+              showSigners={true}
+            />
+          </Col>
+          <Col lg={6} xs={24}>
+            <Owners
+              ownerEvents={ownerEvents}
+              signaturesRequired={signaturesRequired}
+              mainnetProvider={mainnetProvider}
+              blockExplorer={blockExplorer}
+              category={"Burner"}
+              showSigners={false}
+            />
+          </Col>
+        </Row>
+
+    </div>
+
   );
 }

@@ -26,7 +26,7 @@ export default function Owners({
 
   return (
     <div>
-      {showSigners && <h2 style={{marginTop:8}}>Signatures Required: {signaturesRequired ? signaturesRequired.toNumber() :<Spin></Spin>}</h2>}
+      {showSigners ? <h2 style={{marginTop:8}}>Signatures Required: {signaturesRequired ? signaturesRequired.toNumber() :<Spin></Spin>}</h2> : <h2 style={{marginTop:8}}>&nbsp;</h2>}
       <List
         header={<h2>{category}</h2>}
         style={{maxWidth:250, margin:"auto", marginTop:16}}
