@@ -979,7 +979,8 @@ module.exports = {
       },
     },
   },
-  3: { //ropsten
+
+  /*3: { //ropsten
     contracts: {
       MultiSigFactory: {
         address: "0x994043CA30C9273D3a6eb3a98E49d02F72327112", // deployed by gak in april 22, might want to update it to a newer version down the road
@@ -994,7 +995,7 @@ module.exports = {
         abi: MULTISIGABI,
       },
     },
-  },
+  },*/
   5: { //goerli
     contracts: {
       MultiSigFactory: {

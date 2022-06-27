@@ -240,6 +240,8 @@ function App(props) {
   );
   if (DEBUG) console.log("📟 executeTransactionEvents:", allExecuteTransactionEvents);
 
+  const [executeTransactionEvents, setExecuteTransactionEvents] = useState();
+  
   const allOwnerEvents = useEventListener(
     currentMultiSigAddress ? readContracts : null,
     contractNameForEvent,
@@ -250,7 +252,6 @@ function App(props) {
   if (DEBUG) console.log("📟 ownerEvents:", allOwnerEvents);
 
   const [ownerEvents, setOwnerEvents] = useState();
-  const [executeTransactionEvents, setExecuteTransactionEvents] = useState();
 
   useEffect(() => {
     setOwnerEvents(allOwnerEvents.filter(contractEvent => contractEvent.address === currentMultiSigAddress));

@@ -131,7 +131,7 @@ export default function CreateMultiSigModal({
       }
 
       tx(
-        writeContracts[contractName].create(selectedChainId, owners, signaturesRequired, {
+        writeContracts[contractName].create(selectedChainId, burner, owners, signaturesRequired, {
           value: ethers.utils.parseEther("" + parseFloat(amount).toFixed(12)),
         }),
         update => {
