@@ -27,6 +27,7 @@ export default function Transactions({
   blockExplorer,
   contractAddress,
   ownerEvents,
+  burnerEvents,
 }) {
   const [transactions, setTransactions] = useState();
   usePoller(() => {
@@ -206,30 +207,30 @@ export default function Transactions({
             }}
           />
         </div>
-
-        <Row>
-          <Col xs={{ span: 24 }} lg={{ span: 9, offset: 4 }}>
-            <Owners
-              ownerEvents={ownerEvents}
-              signaturesRequired={signaturesRequired}
-              mainnetProvider={mainnetProvider}
-              blockExplorer={blockExplorer}
-              category={"Hardware Wallets"}
-              showSigners={true}
-            />
-          </Col>
-          <Col lg={6} xs={24}>
-            <Owners
-              ownerEvents={ownerEvents}
-              signaturesRequired={signaturesRequired}
-              mainnetProvider={mainnetProvider}
-              blockExplorer={blockExplorer}
-              category={"Burner"}
-              showSigners={false}
-            />
-          </Col>
-        </Row>
-
+        <div style={{maxWidth:600, margin:"auto", paddingBottom:85}}>
+          <Row  justify="center">
+            <Col sm={12} xs={24}>
+              <Owners
+                ownerEvents={ownerEvents}
+                signaturesRequired={signaturesRequired}
+                mainnetProvider={mainnetProvider}
+                blockExplorer={blockExplorer}
+                category={"Hardware Wallets"}
+                showSigners={true}
+              />
+            </Col>
+            <Col sm={12} xs={24}>
+              <Owners
+                ownerEvents={burnerEvents}
+                signaturesRequired={signaturesRequired}
+                mainnetProvider={mainnetProvider}
+                blockExplorer={blockExplorer}
+                category={"Burner"}
+                showSigners={false}
+              />
+            </Col>
+          </Row>
+        </div>
     </div>
 
   );

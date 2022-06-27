@@ -256,6 +256,21 @@ function App(props) {
     setOwnerEvents(allOwnerEvents.filter(contractEvent => contractEvent.address === currentMultiSigAddress));
   }, [allOwnerEvents, currentMultiSigAddress]);
 
+  const allBurnerEvents = useEventListener(
+    currentMultiSigAddress ? readContracts : null,
+    contractNameForEvent,
+    "Burner",
+    localProvider,
+    1,
+  );
+  if (DEBUG) console.log("📟 burnerEvents:", allBurnerEvents);
+
+  const [burnerEvents, setBurnerEvents] = useState();
+
+  useEffect(() => {
+    setBurnerEvents(allBurnerEvents.filter(contractEvent => contractEvent.address === currentMultiSigAddress));
+  }, [allBurnerEvents, currentMultiSigAddress]);
+
   useEffect(() => {
     const filteredEvents = allExecuteTransactionEvents.filter(contractEvent => contractEvent.address === currentMultiSigAddress);
     const nonceNum = typeof(nonce) === "number" ? nonce : nonce?.toNumber();
@@ -505,6 +520,7 @@ function App(props) {
             signaturesRequired={signaturesRequired}
             contractAddress={currentMultiSigAddress}
             ownerEvents={ownerEvents}
+            burnerEvents={burnerEvents}
           />
         </Route>
         <Route exact path="/debug">

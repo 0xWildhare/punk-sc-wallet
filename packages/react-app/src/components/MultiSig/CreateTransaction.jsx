@@ -28,7 +28,7 @@ export default function CreateTransaction({
 }) {
   const history = useHistory();
 
-  const [methodName, setMethodName] = useLocalStorage("methodName", "transferFunds")
+  const [methodName1, setMethodName1] = useLocalStorage("methodName1", "transferFunds")
   const [newSignaturesRequired, setNewSignaturesRequired] = useState(signaturesRequired)
   const [amount, setAmount] = useState("0");
   const [to, setTo] = useLocalStorage("to");
@@ -130,11 +130,11 @@ export default function CreateTransaction({
       setLoading(true)
       let callData;
       let executeToAddress;
-      if (methodName == "transferFunds" || methodName == "customCallData" || methodName == "wcCallData") {
-        callData = methodName == "transferFunds" ? "0x" : customCallData;
+      if (methodName1 == "transferFunds" || methodName1 == "customCallData" || methodName1 == "wcCallData") {
+        callData = methodName1 == "transferFunds" ? "0x" : customCallData;
         executeToAddress = to;
       } else {
-        callData = readContracts[contractName]?.interface?.encodeFunctionData(methodName, [to, newSignaturesRequired]);
+        callData = readContracts[contractName]?.interface?.encodeFunctionData(methodName1, [to, newSignaturesRequired]);
         executeToAddress = contractAddress;
       }
 
@@ -190,7 +190,7 @@ export default function CreateTransaction({
       <div style={{ border: "1px solid #cccccc", padding: 16, width: 420, margin: "auto", marginTop: 8 }}>
         <div style={{ margin: 8 }}>
           <div style={{ margin: 8, padding: 8 }}>
-            <Select value={methodName} style={{ width: "100%" }} onChange={setMethodName}>
+            <Select value={methodName1} style={{ width: "100%" }} onChange={setMethodName1}>
               <Option key="transferFunds">Send ETH</Option>
               <Option key="customCallData">Custom Call Data</Option>
               <Option key="wcCallData">
@@ -198,7 +198,7 @@ export default function CreateTransaction({
               </Option>
             </Select>
           </div>
-          {methodName == "wcCallData" ? (
+          {methodName1 == "wcCallData" ? (
             <div style={inputStyle}>
               <WalletConnectInput
                 chainId={localProvider?._network.chainId}
@@ -214,14 +214,14 @@ export default function CreateTransaction({
                 <AddressInput
                   autoFocus
                   ensProvider={mainnetProvider}
-                  placeholder={methodName == "transferFunds" ? "Recepient address" : "Owner address"}
+                  placeholder={methodName1 == "transferFunds" ? "Recepient address" : "Owner address"}
                   value={to}
                   onChange={setTo}
                 />
               </div>
               <div style={inputStyle}>
 
-                {methodName == "customCallData" &&
+                {methodName1 == "customCallData" &&
                   <>
                     <Input.Group compact>
                       <Input
@@ -246,7 +246,7 @@ export default function CreateTransaction({
                     />
                   </>
                 }
-                {(methodName == "transferFunds" || methodName == "customCallData") &&
+                {(methodName1 == "transferFunds" || methodName1 == "customCallData") &&
                   <EtherInput
                     price={price}
                     mode="USD"
