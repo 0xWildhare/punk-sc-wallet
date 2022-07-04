@@ -160,8 +160,9 @@ function App(props) {
   //📟 Listen for broadcast events
 
   // MultiSigFactory Events:
-  const ownersMultiSigEvents = useEventListener(readContracts, "MultiSigFactory", "Owners", localProvider, 1);
+  const ownersMultiSigEvents = useEventListener(readContracts, "MultiSigFactory", "Create", localProvider, 1);
   if (DEBUG) console.log("📟 ownersMultiSigEvents:", ownersMultiSigEvents);
+
 
   const [multiSigs, setMultiSigs] = useState([]);
   const [currentMultiSigAddress, setCurrentMultiSigAddress] = useState();
@@ -183,7 +184,9 @@ function App(props) {
         if (createEvent.args.owners.includes(address) && !filtered.includes(createEvent.args.contractAddress)) {
           filtered.push(createEvent.args.contractAddress);
         }
-
+        if (createEvent.args.burner.includes(address) && !filtered.includes(createEvent.args.contractAddress)) {
+          filtered.push(createEvent.args.contractAddress);
+        }
         return filtered;
       }, []);
 
@@ -241,7 +244,7 @@ function App(props) {
   if (DEBUG) console.log("📟 executeTransactionEvents:", allExecuteTransactionEvents);
 
   const [executeTransactionEvents, setExecuteTransactionEvents] = useState();
-  
+
   const allOwnerEvents = useEventListener(
     currentMultiSigAddress ? readContracts : null,
     contractNameForEvent,
@@ -270,6 +273,7 @@ function App(props) {
 
   useEffect(() => {
     setBurnerEvents(allBurnerEvents.filter(contractEvent => contractEvent.address === currentMultiSigAddress));
+
   }, [allBurnerEvents, currentMultiSigAddress]);
 
   useEffect(() => {

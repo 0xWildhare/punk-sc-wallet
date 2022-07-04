@@ -59,9 +59,9 @@ export default function TransactionListItem({ item, mainnetProvider, blockExplor
           {ethers.utils.isAddress(txnData[item.hash]?.args[0]) &&
             <Address address={txnData[item.hash]?.args[0]} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={16} />
           }
-          <span style={{fontSize:16}}>
+          {/*<span style={{fontSize:16}}>
             with threshold {txnData[item.hash]?.args[1]?.toNumber()}
-          </span>
+          </span>*/}
           <>
             {
               children
@@ -80,9 +80,9 @@ export default function TransactionListItem({ item, mainnetProvider, blockExplor
           {ethers.utils.isAddress(txnData[item.hash]?.args[0]) &&
             <Address address={txnData[item.hash]?.args[0]} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={16} />
           }
-          <span style={{fontSize:16}}>
+          {/*<span style={{fontSize:16}}>
             with threshold {txnData[item.hash]?.args[1]?.toNumber()}
-          </span>
+          </span>*/}
           <>
             {
               children

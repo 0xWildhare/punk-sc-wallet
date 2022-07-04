@@ -29,6 +29,7 @@ export default function Transactions({
   ownerEvents,
   burnerEvents,
 }) {
+
   const [transactions, setTransactions] = useState();
   usePoller(() => {
     const getTransactions = async () => {
@@ -141,7 +142,7 @@ export default function Transactions({
               >
                 <div style={{padding:16}}>
                   <span style={{padding:4}}>
-                    {item.signatures.length}/{signaturesRequired.toNumber()} {hasSigned ? "✅" : ""}
+                    {item.validSignatures.length}/{signaturesRequired.toNumber()} {hasSigned ? "✅" : ""}
                   </span>
                   <span style={{padding:4}}>
                     <Button
@@ -211,22 +212,23 @@ export default function Transactions({
           <Row  justify="center">
             <Col sm={12} xs={24}>
               <Owners
-                ownerEvents={ownerEvents}
-                signaturesRequired={signaturesRequired}
-                mainnetProvider={mainnetProvider}
-                blockExplorer={blockExplorer}
-                category={"Hardware Wallets"}
-                showSigners={true}
-              />
-            </Col>
-            <Col sm={12} xs={24}>
-              <Owners
                 ownerEvents={burnerEvents}
                 signaturesRequired={signaturesRequired}
                 mainnetProvider={mainnetProvider}
                 blockExplorer={blockExplorer}
-                category={"Burner"}
+                category={["Burner Wallet", "burner"]}
                 showSigners={false}
+              />
+
+            </Col>
+            <Col sm={12} xs={24}>
+              <Owners
+                ownerEvents={ownerEvents}
+                signaturesRequired={signaturesRequired}
+                mainnetProvider={mainnetProvider}
+                blockExplorer={blockExplorer}
+                category={["Hardware Wallets", "owner"]}
+                showSigners={true}
               />
             </Col>
           </Row>

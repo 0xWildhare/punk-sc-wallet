@@ -6,6 +6,7 @@ import { AddressInput, EtherInput, WalletConnectInput } from "../";
 import TransactionDetailsModal from "./TransactionDetailsModal";
 import { parseExternalContractTransaction } from "../../helpers";
 import { useLocalStorage } from "../../hooks";
+import { useContractReader } from "eth-hooks";
 import { ethers } from "ethers";
 import { parseEther } from "@ethersproject/units";
 const { Option } = Select;
@@ -73,6 +74,9 @@ export default function AddRemoveSigners({
     setIsWalletConnectTransaction(false);
   }, [isWalletConnectTransaction]);
 
+  const burner = useContractReader(readContracts, contractName, "burner");
+  console.log("burnerAddy", burner);
+
   const createTransaction = async () => {
     try {
 
@@ -108,7 +112,10 @@ export default function AddRemoveSigners({
         const isOwner = await readContracts[contractName].isOwner(recover);
         console.log("isOwner: ", isOwner);
 
-        if (isOwner) {
+        const isBurner = burner == recover;
+        console.log("isBurner", isBurner);
+
+        if (isOwner || isBurner) {
           const res = await axios.post(poolServerUrl, {
             chainId: localProvider._network.chainId,
             address: readContracts[contractName]?.address,

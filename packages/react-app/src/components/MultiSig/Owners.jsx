@@ -12,15 +12,17 @@ export default function Owners({
   category,
   showSigners,
 }) {
+  const [heading, funcArg] = category;
   const owners = new Set();
   const prevOwners = new Set();
   ownerEvents.forEach((ownerEvent) => {
     if (ownerEvent.args.added) {
-      owners.add(ownerEvent.args.owner);
-      prevOwners.delete(ownerEvent.args.owner)
+      owners.add(ownerEvent.args[funcArg]);
+      //args.owner stupid
+      prevOwners.delete(ownerEvent.args[funcArg])
     } else {
-      prevOwners.add(ownerEvent.args.owner)
-      owners.delete(ownerEvent.args.owner);
+      prevOwners.add(ownerEvent.args[funcArg])
+      owners.delete(ownerEvent.args[funcArg]);
     }
   });
 
@@ -28,13 +30,15 @@ export default function Owners({
     <div>
       {showSigners ? <h2 style={{marginTop:8}}>Signatures Required: {signaturesRequired ? signaturesRequired.toNumber() :<Spin></Spin>}</h2> : <h2 style={{marginTop:8}}>&nbsp;</h2>}
       <List
-        header={<h2>{category}</h2>}
+        key={heading}
+        header={<h2>{heading}</h2>}
         style={{maxWidth:250, margin:"auto", marginTop:16}}
         bordered
         dataSource={[...owners]}
         renderItem={(ownerAddress) => {
           return (
-            <List.Item key={"owner_" + ownerAddress}>
+            <List.Item key={heading + ownerAddress}>
+
               <Address
                 address={ownerAddress}
                 ensProvider={mainnetProvider}
@@ -47,7 +51,7 @@ export default function Owners({
       />
 
       <Collapse collapsible={prevOwners.size == 0 ? "disabled" : ""} style={{maxWidth:250, margin:"auto", marginTop:10}}>
-        <Panel header={"Previous "+category} key="1">
+        <Panel header={"Previous "+heading} key="1">
           <List
             dataSource={[...prevOwners]}
             renderItem={(prevOwnerAddress) => {

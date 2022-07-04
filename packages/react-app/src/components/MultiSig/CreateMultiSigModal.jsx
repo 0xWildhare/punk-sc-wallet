@@ -201,7 +201,7 @@ export default function CreateMultiSigModal({
             value={multipleAddress}
           /> */}
           <div style={{ width: "90%" }}>
-            Burner
+            Burner Wallet
             <AddressInput
               autoFocus
               ensProvider={mainnetProvider}
@@ -211,7 +211,7 @@ export default function CreateMultiSigModal({
             />
           </div>
           <div>
-            Owner(s)
+            Hardware Wallet(s)
             {owners.map((owner, index) => (
               <div key={index} style={{ display: "flex", gap: "1rem" }}>
                 <div style={{ width: "90%" }}>
