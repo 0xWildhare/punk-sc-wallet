@@ -81,20 +81,22 @@ export default function AddRemoveSigners({
     try {
 
       //a little security in the frontend just because
-      if(newSignaturesRequired<1){
+      if(methodName != "cancelBurner" && newSignaturesRequired<1){
         alert("signatures required must be >= 1")
       }else{
         setLoading(true)
 
         let callData;
         let executeToAddress;
-        if (methodName == "transferFunds" || methodName == "customCallData" || methodName == "wcCallData") {
-          callData = methodName == "transferFunds" ? "0x" : customCallData;
-          executeToAddress = to;
-        } else {
+        if(methodName == "addSigner" || methodName == "removeSigner"){
           callData = readContracts[contractName]?.interface?.encodeFunctionData(methodName, [to, newSignaturesRequired]);
-          executeToAddress = contractAddress;
+        }else if(methodName == "cancelBurner"){
+          callData = readContracts[contractName]?.interface?.encodeFunctionData(methodName);
+        }else{
+          callData = readContracts[contractName]?.interface?.encodeFunctionData(methodName, [to])
         }
+        executeToAddress = contractAddress;
+
 
         const newHash = await readContracts[contractName].getTransactionHash(
           nonce.toNumber(),
@@ -155,34 +157,38 @@ export default function AddRemoveSigners({
 
               <Option key="addSigner">Add Hardware Wallet</Option>
               <Option key="removeSigner">Remove Hardware Wallet</Option>
+              <Option key="cancelBurner">Cancel Current Burner</Option>
+              <Option key="changeBurner">Change Burner Wallet</Option>
 
             </Select>
           </div>
 
             <>
-              <div style={inputStyle}>
-                <AddressInput
-                  autoFocus
-                  ensProvider={mainnetProvider}
-                  placeholder={methodName == "transferFunds" ? "Recepient address" : "Owner address"}
-                  value={to}
-                  onChange={setTo}
-                />
-              </div>
-              <div style={inputStyle}>
-                {(methodName == "addSigner" || methodName == "removeSigner") &&
-                  <InputNumber
-                    style={{ width: "100%" }}
-                    placeholder="New # of signatures required"
-                    value={newSignaturesRequired}
-                    onChange={(value)=>{
-                      setNewSignaturesRequired(value)
-                      setHasEdited(true)
-                    }}
+              {(methodName != "cancelBurner") &&
+                <div style={inputStyle}>
+                  <AddressInput
+                    autoFocus
+                    ensProvider={mainnetProvider}
+                    placeholder={methodName == "transferFunds" ? "Recepient address" : "Owner address"}
+                    value={to}
+                    onChange={setTo}
                   />
-                }
+                </div>
+              }
+              {(methodName == "addSigner" || methodName == "removeSigner") &&
+                <div style={inputStyle}>
 
-              </div>
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      placeholder="New # of signatures required"
+                      value={newSignaturesRequired}
+                      onChange={(value)=>{
+                        setNewSignaturesRequired(value)
+                        setHasEdited(true)
+                      }}
+                    />
+                </div>
+              }
               <Space style={{ marginTop: 32 }}>
                 <Button
                   loading={loading}

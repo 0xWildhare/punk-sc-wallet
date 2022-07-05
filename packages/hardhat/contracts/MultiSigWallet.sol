@@ -83,6 +83,18 @@ contract MultiSigWallet {
     multiSigFactory.emitOwners(address(this), owners, newSignaturesRequired);
   }
 
+	function cancelBurner() public onlySelf {
+		emit Burner(burner, false);
+		burner = address(0x0);
+	}
+
+	function changeBurner(address newBurner) public onlySelf {
+		if(burner != address(0x0)) emit Burner(burner, false);
+		burner = newBurner;
+		emit Burner(burner, true);
+	}
+
+
   function _removeOwner(address _oldSigner) private {
     isOwner[_oldSigner] = false;
     uint256 ownersLength = owners.length;
