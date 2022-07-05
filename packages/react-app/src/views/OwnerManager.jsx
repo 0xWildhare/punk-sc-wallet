@@ -10,7 +10,7 @@ const axios = require("axios");
 
 const DEBUG = false;
 
-export default function Transactions({
+export default function OwnerManager({
   poolServerUrl,
   contractName,
   signaturesRequired,

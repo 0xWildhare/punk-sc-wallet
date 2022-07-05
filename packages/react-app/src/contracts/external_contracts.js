@@ -786,179 +786,190 @@ const DAIABI = [
 
 const MULTISIGABI = [
   {
-    inputs: [],
-    stateMutability: "nonpayable",
-    type: "constructor",
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "contractId",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "contractId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        internalType: "address",
-        name: "contractAddress",
-        type: "address",
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
       },
       {
-        indexed: false,
-        internalType: "address",
-        name: "creator",
-        type: "address",
+        "indexed": false,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
       },
       {
-        indexed: false,
-        internalType: "address[]",
-        name: "owners",
-        type: "address[]",
+        "indexed": false,
+        "internalType": "address",
+        "name": "burner",
+        "type": "address"
       },
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "signaturesRequired",
-        type: "uint256",
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "owners",
+        "type": "address[]"
       },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "signaturesRequired",
+        "type": "uint256"
+      }
     ],
-    name: "Create",
-    type: "event",
+    "name": "Create",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "address",
-        name: "contractAddress",
-        type: "address",
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
       },
       {
-        indexed: false,
-        internalType: "address[]",
-        name: "owners",
-        type: "address[]",
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "owners",
+        "type": "address[]"
       },
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "signaturesRequired",
-        type: "uint256",
-      },
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "signaturesRequired",
+        "type": "uint256"
+      }
     ],
-    name: "Owners",
-    type: "event",
+    "name": "Owners",
+    "type": "event"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_chainId",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "_chainId",
+        "type": "uint256"
       },
       {
-        internalType: "address[]",
-        name: "_owners",
-        type: "address[]",
+        "internalType": "address",
+        "name": "_burner",
+        "type": "address"
       },
       {
-        internalType: "uint256",
-        name: "_signaturesRequired",
-        type: "uint256",
+        "internalType": "address[]",
+        "name": "_owners",
+        "type": "address[]"
       },
+      {
+        "internalType": "uint256",
+        "name": "_signaturesRequired",
+        "type": "uint256"
+      }
     ],
-    name: "create",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
+    "name": "create",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "address",
-        name: "_contractAddress",
-        type: "address",
+        "internalType": "address",
+        "name": "_contractAddress",
+        "type": "address"
       },
       {
-        internalType: "address[]",
-        name: "_owners",
-        type: "address[]",
+        "internalType": "address[]",
+        "name": "_owners",
+        "type": "address[]"
       },
       {
-        internalType: "uint256",
-        name: "_signaturesRequired",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "_signaturesRequired",
+        "type": "uint256"
+      }
     ],
-    name: "emitOwners",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "emitOwners",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_index",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "_index",
+        "type": "uint256"
+      }
     ],
-    name: "getMultiSig",
-    outputs: [
+    "name": "getMultiSig",
+    "outputs": [
       {
-        internalType: "address",
-        name: "multiSigAddress",
-        type: "address",
+        "internalType": "address",
+        "name": "multiSigAddress",
+        "type": "address"
       },
       {
-        internalType: "uint256",
-        name: "signaturesRequired",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "signaturesRequired",
+        "type": "uint256"
       },
       {
-        internalType: "uint256",
-        name: "balance",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "balance",
+        "type": "uint256"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    name: "multiSigs",
-    outputs: [
+    "name": "multiSigs",
+    "outputs": [
       {
-        internalType: "contract MultiSigWallet",
-        name: "",
-        type: "address",
-      },
+        "internalType": "contract MultiSigWallet",
+        "name": "",
+        "type": "address"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: "numberOfMultiSigs",
-    outputs: [
+    "inputs": [],
+    "name": "numberOfMultiSigs",
+    "outputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
-  },
+    "stateMutability": "view",
+    "type": "function"
+  }
 ];
 
 // Mainnet DAI, Optimism and Arbitrium Rollup Contracts with local addresses
@@ -974,16 +985,16 @@ module.exports = {
         abi: ERC20ABI,
       },
       MultiSigFactory: {
-        address: "0x582887d429ab11b8e0b9cbe708bab26dea911eb3", // deployed by Austin in april 22, might want to update it to a newer version down the road
+        address: "0xD3E53F7f17796F3Ed55AD59234E03F6E82aab83c", // deployed by Austin in april 22, might want to update it to a newer version down the road
         abi: MULTISIGABI,
       },
     },
   },
 
-  /*3: { //ropsten
+  3: { //ropsten
     contracts: {
       MultiSigFactory: {
-        address: "0x994043CA30C9273D3a6eb3a98E49d02F72327112", // deployed by gak in april 22, might want to update it to a newer version down the road
+        address: "0xf6D27819bF1f8981a45A36b4B8F21Be47eB40139", // deployed by gak in april 22, might want to update it to a newer version down the road
         abi: MULTISIGABI,
       },
     },
@@ -991,12 +1002,12 @@ module.exports = {
   4: { //rinkeby
     contracts: {
       MultiSigFactory: {
-        address: "0xc827482a5F57132dCC0511901caC9243C35DdB33", // deployed by gak in april 22, might want to update it to a newer version down the road
+        address: "0xe6ad94474bf327afc6d607ff9d76a7c0bf5bfbc8ead954b83c2ad630627d1ef7", // deployed by gak in april 22, might want to update it to a newer version down the road
         abi: MULTISIGABI,
       },
     },
-  },*/
-  5: { //goerli
+  },
+  /*5: { //goerli
     contracts: {
       MultiSigFactory: {
         address: "0x1Dd2afD391b29a7e3618c3DaC720A94FFCf46cc8", // deployed by gak in april 22, might want to update it to a newer version down the road
@@ -1035,7 +1046,7 @@ module.exports = {
         abi: MULTISIGABI,
       },
     },
-  },
+  },*/
 
 
 };

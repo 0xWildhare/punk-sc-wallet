@@ -8,7 +8,9 @@ import { parseExternalContractTransaction } from "../../helpers";
 import { useLocalStorage } from "../../hooks";
 import { ethers } from "ethers";
 import { parseEther } from "@ethersproject/units";
+import ERC20 from "../../contracts/ERC20.json";
 const { Option } = Select;
+
 
 const axios = require("axios");
 
@@ -69,6 +71,42 @@ export default function CreateTransaction({
     setCustomCallData(data);
     setIsWalletConnectTransaction(true);
   };
+
+  const [customTokenAddress, setCustomTokenAddress] = useState();
+  const [custTokenSymbol, setCustTokenSymbol] = useState();
+  const [custTokenName, setCustTokenName] = useState();
+  const [custTokenBalance, setCustTokenBalance] = useState();
+  const [tokDecimals, setTokDecimals] = useState();
+  const [tokenMenuVisibility, setTokenMenuVisibility] = useState("hidden");
+
+  const handleAddressChange = async (e) => {
+    setTo(e);
+    if(methodName1 == "erc20Transaction") {
+      console.log("eeeeee", e)
+      let enteredAddress = e.target.value;
+      if (ethers.utils.isAddress(enteredAddress)) {
+        const customContract = new ethers.Contract(enteredAddress, ERC20.abi, localProvider);
+          setCustomTokenAddress(enteredAddress)
+        const newCustTokenSymbol = await customContract.functions.symbol();
+        const newCustTokenName = await customContract.functions.name();
+        const newCustTokenBalance = await customContract.functions.balanceOf(contractAddress);
+        const newTokDecimals = await customContract.functions.decimals();
+        const newCustTokBalFormatted = ethers.utils.formatUnits(newCustTokenBalance[0], newTokDecimals);
+        console.log('tokBal', newCustTokBalFormatted);
+        setCustTokenSymbol(newCustTokenSymbol);
+        setCustTokenName(newCustTokenName);
+        setCustTokenBalance(newCustTokBalFormatted);
+        setTokDecimals(newTokDecimals);
+        setTokenMenuVisibility("visible")
+      } else {
+        setCustTokenSymbol('');
+        setCustTokenName('');
+        setCustTokenBalance('');
+        setTokenMenuVisibility("hidden")
+      }
+      console.log("customtokenaddress", customTokenAddress);
+    }
+  }
 
   useEffect(() => {
     isWalletConnectTransaction && createTransaction();
@@ -193,6 +231,7 @@ export default function CreateTransaction({
             <Select value={methodName1} style={{ width: "100%" }} onChange={setMethodName1}>
               <Option key="transferFunds">Send ETH</Option>
               <Option key="customCallData">Custom Call Data</Option>
+              <Option key="erc20Transaction">ERC20 Transaction</Option>
               <Option key="wcCallData">
                 <img src="walletconnect-logo.svg" style={{ height: 20, width: 20 }} /> WalletConnect
               </Option>
@@ -219,8 +258,40 @@ export default function CreateTransaction({
                   onChange={setTo}
                 />
               </div>
-              <div style={inputStyle}>
+              <div style={{ clear: "both", width: 350, margin: "auto" ,marginTop:12, position:"relative" }}>
+                {custTokenSymbol ? <>Symbol: &nbsp; {custTokenSymbol}     </> : ''}
+                <>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </>
+                {custTokenName ? <> Name: &nbsp; {custTokenName}</> : ''}
+                <br />
+                {custTokenBalance ? <>Balance: &nbsp; {custTokenBalance}</> : ''}
+              </div>
 
+              <div style={{border:"1px solid #cccccc", padding:16, width:400, margin:"auto",marginTop:12, visibility:tokenMenuVisibility }}>
+                <div style={{margin:8,padding:8}}>
+                  <Select value={methodName1} style={{ width: "100%" }} onChange={ setMethodName1 }>
+                    <Option key="transfer">Transfer</Option>
+                    <Option key="approve">Approve</Option>
+                  </Select>
+                </div>
+                <div style={{margin:8,padding:8}}>
+                  <AddressInput
+                    autoFocus
+                    ensProvider={mainnetProvider}
+                    placeholder={methodName1 == "transfer" ? "to" : "spender"}
+                    value={transferToAddress}
+                    onChange={setTransferToAddress}
+                  />
+                </div>
+                <div style={{margin:8,padding:8}}>
+                  <Input
+                    ensProvider={mainnetProvider}
+                    placeholder="amount"
+                    value={transferAmount}
+                    onChange={handleTransferAmount}
+                  />{/*TODO: Maybe use setCustomCallData?*/}
+                </div>
+              </div>
+              <div style={inputStyle}>
                 {methodName1 == "customCallData" &&
                   <>
                     <Input.Group compact>

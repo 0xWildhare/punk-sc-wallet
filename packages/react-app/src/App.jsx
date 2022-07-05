@@ -34,7 +34,7 @@ import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { Home, Hints, Subgraph, Transactions } from "./views";
+import { Home, Hints, Subgraph, OwnerManager } from "./views";
 import { useStaticJsonRPC, useLocalStorage } from "./hooks";
 
 import Multisig from "./contracts/Multisig.json";
@@ -456,8 +456,8 @@ function App(props) {
           <Link to="/">home</Link>
         </Menu.Item>
 
-        <Menu.Item key="/pool">
-          <Link to="/pool">Manage Signers</Link>
+        <Menu.Item key="/manage">
+          <Link to="/manage">Manage Signers</Link>
         </Menu.Item>
       </Menu>
 
@@ -507,8 +507,8 @@ function App(props) {
 
 
 
-        <Route path="/pool">
-          <Transactions
+        <Route path="/manage">
+          <OwnerManager
             poolServerUrl={BACKEND_URL}
             contractName={contractName}
             address={address}
