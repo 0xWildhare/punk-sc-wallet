@@ -30,7 +30,8 @@ export default function CreateTransaction({
 }) {
   const history = useHistory();
 
-  const [methodName1, setMethodName1] = useLocalStorage("methodName1", "transferFunds")
+  const [methodName1, setMethodName1] = useLocalStorage("methodName1", "transferFunds");
+  const [methodName2, setMethodName2] = useLocalStorage("methodName2", "Transfer");
   const [newSignaturesRequired, setNewSignaturesRequired] = useState(signaturesRequired)
   const [amount, setAmount] = useState("0");
   const [to, setTo] = useLocalStorage("to");
@@ -77,13 +78,30 @@ export default function CreateTransaction({
   const [custTokenName, setCustTokenName] = useState();
   const [custTokenBalance, setCustTokenBalance] = useState();
   const [tokDecimals, setTokDecimals] = useState();
-  const [tokenMenuVisibility, setTokenMenuVisibility] = useState("hidden");
+  const [transferToAddress, setTransferToAddress] = useState();
+  const [transferAmount, setTransferAmount] = useState();
+  const [formattedTransferAmount, setFormattedTransferAmount] = useState();
+  const [methodName, setMethodName] = useState("transfer");
+  const [tokenMenuVisibility, setTokenMenuVisibility] = useState(false);
 
-  const handleAddressChange = async (e) => {
-    setTo(e);
+  const handleTransferTo = async (e) => {
+    let enteredTo = e.target.value;
+    if (ethers.utils.isAddress(enteredTo)) {
+      setTransferToAddress(enteredTo)
+    } else setTransferToAddress('');
+  }
+
+  const handleTransferAmount = async (e) => {
+    let enteredAmount = e.target.value;
+    setTransferAmount(enteredAmount)
+    let enteredAmountFormatted = ethers.utils.parseUnits(enteredAmount, tokDecimals);
+    setFormattedTransferAmount(enteredAmountFormatted);
+  }
+
+  const handleAddressChange = async (enteredAddress) => {
+    setTo(enteredAddress);
     if(methodName1 == "erc20Transaction") {
-      console.log("eeeeee", e)
-      let enteredAddress = e.target.value;
+
       if (ethers.utils.isAddress(enteredAddress)) {
         const customContract = new ethers.Contract(enteredAddress, ERC20.abi, localProvider);
           setCustomTokenAddress(enteredAddress)
@@ -97,12 +115,12 @@ export default function CreateTransaction({
         setCustTokenName(newCustTokenName);
         setCustTokenBalance(newCustTokBalFormatted);
         setTokDecimals(newTokDecimals);
-        setTokenMenuVisibility("visible")
+        setTokenMenuVisibility(true)
       } else {
         setCustTokenSymbol('');
         setCustTokenName('');
         setCustTokenBalance('');
-        setTokenMenuVisibility("hidden")
+        setTokenMenuVisibility(false)
       }
       console.log("customtokenaddress", customTokenAddress);
     }
@@ -255,42 +273,38 @@ export default function CreateTransaction({
                   ensProvider={mainnetProvider}
                   placeholder={methodName1 == "transferFunds" ? "Recepient address" : "Owner address"}
                   value={to}
-                  onChange={setTo}
+                  onChange={handleAddressChange}
                 />
               </div>
-              <div style={{ clear: "both", width: 350, margin: "auto" ,marginTop:12, position:"relative" }}>
-                {custTokenSymbol ? <>Symbol: &nbsp; {custTokenSymbol}     </> : ''}
-                <>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </>
-                {custTokenName ? <> Name: &nbsp; {custTokenName}</> : ''}
-                <br />
-                {custTokenBalance ? <>Balance: &nbsp; {custTokenBalance}</> : ''}
-              </div>
-
-              <div style={{border:"1px solid #cccccc", padding:16, width:400, margin:"auto",marginTop:12, visibility:tokenMenuVisibility }}>
-                <div style={{margin:8,padding:8}}>
-                  <Select value={methodName1} style={{ width: "100%" }} onChange={ setMethodName1 }>
-                    <Option key="transfer">Transfer</Option>
-                    <Option key="approve">Approve</Option>
-                  </Select>
+              {tokenMenuVisibility && methodName1 == "erc20Transaction" &&
+                <div style={{ clear: "both", width: 350, margin: "auto" , position:"relative" }}>
+                  <div>Symbol: &nbsp; {custTokenSymbol} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: &nbsp; {custTokenName}</div>
+                  <div>Balance: &nbsp; {custTokenBalance}</div>
+                  <div style={{margin:8,padding:8}}>
+                    <Select value={methodName2} style={{ width: "100%" }} onChange={ setMethodName2 }>
+                      <Option key="transfer">Transfer</Option>
+                      <Option key="approve">Approve</Option>
+                    </Select>
+                  </div>
+                  <div style={{margin:8,padding:8}}>
+                    <AddressInput
+                      autoFocus
+                      ensProvider={mainnetProvider}
+                      placeholder={methodName2 == "transfer" ? "to" : "spender"}
+                      value={transferToAddress}
+                      onChange={setTransferToAddress}
+                    />
+                  </div>
+                  <div style={{margin:8,padding:8}}>
+                    <Input
+                      ensProvider={mainnetProvider}
+                      placeholder="amount"
+                      value={transferAmount}
+                      onChange={handleTransferAmount}
+                    />{/*TODO: Maybe use setCustomCallData?*/}
+                  </div>
                 </div>
-                <div style={{margin:8,padding:8}}>
-                  <AddressInput
-                    autoFocus
-                    ensProvider={mainnetProvider}
-                    placeholder={methodName1 == "transfer" ? "to" : "spender"}
-                    value={transferToAddress}
-                    onChange={setTransferToAddress}
-                  />
-                </div>
-                <div style={{margin:8,padding:8}}>
-                  <Input
-                    ensProvider={mainnetProvider}
-                    placeholder="amount"
-                    value={transferAmount}
-                    onChange={handleTransferAmount}
-                  />{/*TODO: Maybe use setCustomCallData?*/}
-                </div>
-              </div>
+              }
               <div style={inputStyle}>
                 {methodName1 == "customCallData" &&
                   <>
