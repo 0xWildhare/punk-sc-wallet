@@ -81,7 +81,6 @@ export default function CreateTransaction({
   const [transferToAddress, setTransferToAddress] = useState();
   const [transferAmount, setTransferAmount] = useState();
   const [formattedTransferAmount, setFormattedTransferAmount] = useState();
-  const [methodName, setMethodName] = useState("transfer");
   const [tokenMenuVisibility, setTokenMenuVisibility] = useState(false);
 
   const handleTransferTo = async (e) => {
@@ -125,6 +124,12 @@ export default function CreateTransaction({
       console.log("customtokenaddress", customTokenAddress);
     }
   }
+
+  useEffect(() => {
+    let erc20CallData = "start pulling from multisig cheech"
+    setCustomCallData(erc20CallData);
+    console.log("customCallData", customCallData);
+  }, [customTokenAddress, transferToAddress, transferAmount, methodName2])
 
   useEffect(() => {
     isWalletConnectTransaction && createTransaction();
@@ -186,7 +191,7 @@ export default function CreateTransaction({
       setLoading(true)
       let callData;
       let executeToAddress;
-      if (methodName1 == "transferFunds" || methodName1 == "customCallData" || methodName1 == "wcCallData") {
+      if (methodName1 == "transferFunds" || methodName1 == "customCallData" || methodName1 == "wcCallData" || methodName1 == "erc20Transaction") {
         callData = methodName1 == "transferFunds" ? "0x" : customCallData;
         executeToAddress = to;
       } else {
@@ -278,8 +283,8 @@ export default function CreateTransaction({
               </div>
               {tokenMenuVisibility && methodName1 == "erc20Transaction" &&
                 <div style={{ clear: "both", width: 350, margin: "auto" , position:"relative" }}>
-                  <div>Symbol: &nbsp; {custTokenSymbol} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: &nbsp; {custTokenName}</div>
-                  <div>Balance: &nbsp; {custTokenBalance}</div>
+                  <h3>Symbol: &nbsp; {custTokenSymbol} &nbsp;&nbsp;&nbsp; Name: &nbsp; {custTokenName}</h3>
+                  <h4>Balance: &nbsp; {custTokenBalance}</h4>
                   <div style={{margin:8,padding:8}}>
                     <Select value={methodName2} style={{ width: "100%" }} onChange={ setMethodName2 }>
                       <Option key="transfer">Transfer</Option>
@@ -301,7 +306,7 @@ export default function CreateTransaction({
                       placeholder="amount"
                       value={transferAmount}
                       onChange={handleTransferAmount}
-                    />{/*TODO: Maybe use setCustomCallData?*/}
+                    />
                   </div>
                 </div>
               }
@@ -330,7 +335,7 @@ export default function CreateTransaction({
                       price={price}
                     />
                   </>
-                }
+                }{/*would be badass to use this imput for erc20txns, and feed in the current price for that token*/}
                 {(methodName1 == "transferFunds" || methodName1 == "customCallData") &&
                   <EtherInput
                     price={price}
