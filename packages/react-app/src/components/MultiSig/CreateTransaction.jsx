@@ -11,7 +11,7 @@ import { parseEther } from "@ethersproject/units";
 import ERC20 from "../../contracts/ERC20.json";
 const { Option } = Select;
 
-
+const iface = new ethers.utils.Interface(ERC20.abi);
 const axios = require("axios");
 
 export default function CreateTransaction({
@@ -126,12 +126,6 @@ export default function CreateTransaction({
   }
 
   useEffect(() => {
-    let erc20CallData = "start pulling from multisig cheech"
-    setCustomCallData(erc20CallData);
-    console.log("customCallData", customCallData);
-  }, [customTokenAddress, transferToAddress, transferAmount, methodName2])
-
-  useEffect(() => {
     isWalletConnectTransaction && createTransaction();
     setIsWalletConnectTransaction(false);
   }, [isWalletConnectTransaction]);
@@ -192,7 +186,7 @@ export default function CreateTransaction({
       let callData;
       let executeToAddress;
       if (methodName1 == "transferFunds" || methodName1 == "customCallData" || methodName1 == "wcCallData" || methodName1 == "erc20Transaction") {
-        callData = methodName1 == "transferFunds" ? "0x" : customCallData;
+        callData = methodName1 == "transferFunds" ? "0x" : methodName1 == "erc20Transaction" ? iface.encodeFunctionData(methodName2,[transferToAddress, formattedTransferAmount]) : customCallData;
         executeToAddress = to;
       } else {
         callData = readContracts[contractName]?.interface?.encodeFunctionData(methodName1, [to, newSignaturesRequired]);
@@ -244,6 +238,7 @@ export default function CreateTransaction({
       setLoading(false);
     }
   };
+
 
   return (
     <div>
