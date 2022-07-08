@@ -34,7 +34,7 @@ import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { Home, Hints, Subgraph, OwnerManager } from "./views";
+import { Home, Hints, Subgraph, OwnerManager, History } from "./views";
 import { useStaticJsonRPC, useLocalStorage } from "./hooks";
 
 import Multisig from "./contracts/Multisig.json";
@@ -459,6 +459,10 @@ function App(props) {
         <Menu.Item key="/manage">
           <Link to="/manage">Manage Signers</Link>
         </Menu.Item>
+
+        <Menu.Item key="/history">
+          <Link to="/history">History</Link>
+        </Menu.Item>
       </Menu>
 
       <Switch>
@@ -504,9 +508,6 @@ function App(props) {
             </div>
           )}
         </Route>
-
-
-
         <Route path="/manage">
           <OwnerManager
             poolServerUrl={BACKEND_URL}
@@ -528,15 +529,16 @@ function App(props) {
             burnerEvents={burnerEvents}
           />
         </Route>
-        <Route exact path="/debug">
-          <Contract
-            name={"MultiSigFactory"}
+        <Route exact path="/history">
+          <History
             price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
+            mainnetProvider={mainnetProvider}
             blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
+            executeTransactionEvents={executeTransactionEvents}
+            contractName={contractName}
+            readContracts={readContracts}
+            address={address}
+            contractAddress={currentMultiSigAddress}
           />
         </Route>
         <Route path="/hints">

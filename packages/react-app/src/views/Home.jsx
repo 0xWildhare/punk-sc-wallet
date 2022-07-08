@@ -67,33 +67,6 @@ export default function Home({
           />
           </div>
         </div>
-        {/* Maybe this goes on another page
-        <div style={{padding:32}}>
-          <Owners
-            ownerEvents={ownerEvents}
-            signaturesRequired={signaturesRequired}
-            mainnetProvider={mainnetProvider}
-            blockExplorer={blockExplorer}
-          />
-        </div>*/}
-
-        {/* Also probably for another page
-          <List
-          bordered
-          dataSource={executeTransactionEvents}
-          renderItem={item => {
-            return (
-              <TransactionListItem
-                item={Object.create(item)}
-                mainnetProvider={mainnetProvider}
-                blockExplorer={blockExplorer}
-                price={price}
-                readContracts={readContracts}
-                contractName={contractName}
-              />
-            );
-          }}
-        />*/}
       </div>
 
 
