@@ -151,6 +151,19 @@ contract MultiSigWallet {
     return result;
   }
 
+	//eip1271
+	function isValidSignature(
+    bytes32 _hash,
+    bytes calldata _signature
+  ) external override view returns (bytes4) {
+    // Validate signatures
+    if (recover(_hash, _signature) == burner) {
+      return 0x1626ba7e;
+    } else {
+      return 0xffffffff;
+    }
+  }
+
   function getTransactionHash( uint256 _nonce, address to, uint256 value, bytes memory data ) public view returns (bytes32) {
     return keccak256(abi.encodePacked(address(this), chainId, _nonce, to, value, data));
   }

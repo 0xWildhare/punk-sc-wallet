@@ -80,7 +80,7 @@ function App(props) {
   if (targetNetwork && targetNetwork.name && targetNetwork.name != "localhost") {
     BACKEND_URL = "https://backend.multisig.lol:49899/";
   }
-
+console.log("targetNetwork", targetNetwork, "backend",BACKEND_URL);
   if(!targetNetwork) targetNetwork = NETWORKS["localhost"];
 
   // 🔭 block explorer URL
