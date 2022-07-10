@@ -23,6 +23,7 @@ export default function CreateTransaction({
   price,
   readContracts,
   userSigner,
+  userProvider,
   nonce,
   signaturesRequired,
   tx,
@@ -264,6 +265,7 @@ export default function CreateTransaction({
                 mainnetProvider={mainnetProvider}
                 price={price}
                 userSigner={userSigner}
+                userProvider={userProvider}
               />
             </div>
           ) : (

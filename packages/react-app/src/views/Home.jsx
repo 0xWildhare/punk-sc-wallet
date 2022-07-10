@@ -24,6 +24,7 @@ export default function Home({
   poolServerUrl,
   tx,
   userSigner,
+  userProvider,
   DEBUG,
   nonce,
   writeContracts,
@@ -58,6 +59,7 @@ export default function Home({
             tx={tx}
             readContracts={readContracts}
             userSigner={userSigner}
+            userProvider={userProvider}
             DEBUG={DEBUG}
             nonce={nonce}
             blockExplorer={blockExplorer}

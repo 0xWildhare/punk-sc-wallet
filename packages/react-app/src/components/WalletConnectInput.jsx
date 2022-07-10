@@ -1,5 +1,5 @@
-import { Button, Input, Badge } from "antd";
-import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
+import { Button, Input, Badge, Modal } from "antd";
+import { CameraOutlined, QrcodeOutlined, SendOutlined } from "@ant-design/icons";
 import WalletConnect from "@walletconnect/client";
 import QrReader from "react-qr-reader";
 import { useState, useEffect } from "react";
@@ -7,7 +7,18 @@ import { useLocalStorage } from "../hooks";
 import { parseExternalContractTransaction } from "../helpers";
 import TransactionDetailsModal from "./MultiSig/TransactionDetailsModal";
 
-const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetProvider, price, userSigner }) => {
+const { confirm } = Modal;
+
+const WalletConnectInput =
+  ({
+    chainId,
+    address,
+    loadWalletConnectData,
+    mainnetProvider,
+    price,
+    userSigner,
+    userProvider,
+  }) => {
   const [walletConnectConnector, setWalletConnectConnector] = useLocalStorage("walletConnectConnector");
   const [wallectConnectConnectorSession, setWallectConnectConnectorSession] = useLocalStorage(
     "wallectConnectConnectorSession",
@@ -58,8 +69,6 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
     return connector;
   };
 
-  let result;
-
   const subscribeToEvents = connector => {
     connector.on("session_request", (error, payload) => {
       if (error) {
@@ -90,13 +99,29 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
       if (payload.method === 'eth_sendTransaction') {
         parseCallRequest(payload);
       } else {
-        signMessage(payload);
-        console.log("RESULT:",result)
+        confirm({
+          width: "90%",
+          size: "large",
+          title: 'Sign Message?',
+          icon: <SendOutlined/>,
+          content: <pre>{payload && JSON.stringify(payload.params, null, 2)}</pre>,
+          onOk:async ()=>{
+            let result;
+            console.log("payload", payload);
+            console.log("userProvider", userProvider);
 
-        connector.approveRequest({
-          id: payload.id,
-          result: result.hash ? result.hash : result
-        });
+            let params = payload.params[0];
+
+            result = await userSigner.signMessage(payload.method, payload.params);
+
+            console.log("RESULT:",result)
+
+            connector.approveRequest({
+              id: payload.id,
+              result: result.hash ? result.hash : result
+            });
+          }
+        })
       }
     });
     //
@@ -165,44 +190,16 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
 
   const decodeFunctionData = async () => {
     try {
-      const parsedTransactionData = await parseExternalContractTransaction(to, data);
-      setParsedTransactionData(parsedTransactionData);
+      const newParsedTransactionData = await parseExternalContractTransaction(to, data);
+      setParsedTransactionData(newParsedTransactionData);
       setIsModalVisible(true);
+      console.log("parsedTxn", newParsedTransactionData);
     } catch (error) {
 
       setParsedTransactionData(null);
     }
   };
 
-  const signMessage = async (payload) => {
-    if(payload.method === 'eth_signTypedData_v4') {
-      try {
-
-        // I'm not sure if all the Dapps send an array or not
-        let params = payload.params;
-        if (Array.isArray(params)) {
-          params = params[1];
-        }
-
-        // Ethers uses gasLimit instead of gas
-        let gasLimit = params.gas;
-        params.gasLimit = gasLimit;
-        delete params.gas;
-
-        result = await userSigner.signMessage(params);
-
-        //const transactionManager = new TransactionManager(userProvider, signer, true);
-        //transactionManager.setTransactionResponse(result);
-      }
-      catch (error) {
-        // Fallback to original code without the speed up option
-        console.error("Coudn't create transaction which can be speed up", error);
-        result = await userSigner.send(payload.method, payload.params)
-      }
-    } else {
-      result = await userSigner.send(payload.method, payload.params)
-    }
-  }
   //
 
   const killSession = () => {

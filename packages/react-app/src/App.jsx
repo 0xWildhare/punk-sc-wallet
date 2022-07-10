@@ -115,6 +115,9 @@ console.log("targetNetwork", targetNetwork, "backend",BACKEND_URL);
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider, USE_BURNER_WALLET);
   const userSigner = userProviderAndSigner.signer;
+  const userProvider = userProviderAndSigner.provider;
+  console.log("userprovider", userProvider);
+  console.log("userSigner", userSigner);
 
   useEffect(() => {
     async function getAddress() {
@@ -500,6 +503,7 @@ console.log("targetNetwork", targetNetwork, "backend",BACKEND_URL);
                 poolServerUrl={BACKEND_URL}
                 tx={tx}
                 userSigner={userSigner}
+                userProvider={userProvider}
                 DEBUG={DEBUG}
                 nonce={nonce}
                 writeContracts={writeContracts}
