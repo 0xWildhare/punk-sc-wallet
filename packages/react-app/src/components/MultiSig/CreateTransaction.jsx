@@ -263,6 +263,7 @@ export default function CreateTransaction({
                 loadWalletConnectData={loadWalletConnectData}
                 mainnetProvider={mainnetProvider}
                 price={price}
+                userSigner={userSigner}
               />
             </div>
           ) : (

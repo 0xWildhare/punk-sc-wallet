@@ -7,7 +7,7 @@ import { useLocalStorage } from "../hooks";
 import { parseExternalContractTransaction } from "../helpers";
 import TransactionDetailsModal from "./MultiSig/TransactionDetailsModal";
 
-const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetProvider, price }) => {
+const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetProvider, price, userSigner }) => {
   const [walletConnectConnector, setWalletConnectConnector] = useLocalStorage("walletConnectConnector");
   const [wallectConnectConnectorSession, setWallectConnectConnectorSession] = useLocalStorage(
     "wallectConnectConnectorSession",
@@ -58,6 +58,8 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
     return connector;
   };
 
+  let result;
+
   const subscribeToEvents = connector => {
     connector.on("session_request", (error, payload) => {
       if (error) {
@@ -85,7 +87,17 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
       }
 
       console.log("Event: call_request", payload);
-      parseCallRequest(payload);
+      if (payload.method === 'eth_sendTransaction') {
+        parseCallRequest(payload);
+      } else {
+        signMessage(payload);
+        console.log("RESULT:",result)
+
+        connector.approveRequest({
+          id: payload.id,
+          result: result.hash ? result.hash : result
+        });
+      }
     });
     //
 
@@ -161,6 +173,36 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
       setParsedTransactionData(null);
     }
   };
+
+  const signMessage = async (payload) => {
+    if(payload.method === 'eth_signTypedData_v4') {
+      try {
+
+        // I'm not sure if all the Dapps send an array or not
+        let params = payload.params;
+        if (Array.isArray(params)) {
+          params = params[1];
+        }
+
+        // Ethers uses gasLimit instead of gas
+        let gasLimit = params.gas;
+        params.gasLimit = gasLimit;
+        delete params.gas;
+
+        result = await userSigner.signMessage(params);
+
+        //const transactionManager = new TransactionManager(userProvider, signer, true);
+        //transactionManager.setTransactionResponse(result);
+      }
+      catch (error) {
+        // Fallback to original code without the speed up option
+        console.error("Coudn't create transaction which can be speed up", error);
+        result = await userSigner.send(payload.method, payload.params)
+      }
+    } else {
+      result = await userSigner.send(payload.method, payload.params)
+    }
+  }
   //
 
   const killSession = () => {

@@ -985,7 +985,7 @@ module.exports = {
         abi: ERC20ABI,
       },
       MultiSigFactory: {
-        address: "0xD3E53F7f17796F3Ed55AD59234E03F6E82aab83c", // deployed by Austin in april 22, might want to update it to a newer version down the road
+        address: "0x71Bff36C93634a09e5F26bEa5B17B066b5F6991E", // deployed by 0xWildhare 7/2022
         abi: MULTISIGABI,
       },
     },
