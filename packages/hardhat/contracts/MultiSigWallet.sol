@@ -155,7 +155,7 @@ contract MultiSigWallet {
 	function isValidSignature(
     bytes32 _hash,
     bytes calldata _signature
-  ) external override view returns (bytes4) {
+  ) external view returns (bytes4) {
     // Validate signatures
     if (recover(_hash, _signature) == burner) {
       return 0x1626ba7e;

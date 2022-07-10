@@ -994,7 +994,7 @@ module.exports = {
   3: { //ropsten
     contracts: {
       MultiSigFactory: {
-        address: "0xf6D27819bF1f8981a45A36b4B8F21Be47eB40139", // deployed by gak in april 22, might want to update it to a newer version down the road
+        address: "0xBB60982745E70DCfb8E4b4A5aC36DC8Ba07417Bf", // deployed by 0xWildhare 7/2022
         abi: MULTISIGABI,
       },
     },
@@ -1002,7 +1002,7 @@ module.exports = {
   4: { //rinkeby
     contracts: {
       MultiSigFactory: {
-        address: "0xe6ad94474bf327afc6d607ff9d76a7c0bf5bfbc8ead954b83c2ad630627d1ef7", // deployed by gak in april 22, might want to update it to a newer version down the road
+        address: "0x0013f09Bd637D39c659f121f93B4C5b8dAa3A561", // deployed by 0xWildhare 7/2022
         abi: MULTISIGABI,
       },
     },

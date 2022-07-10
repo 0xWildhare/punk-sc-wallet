@@ -157,7 +157,7 @@ const WalletConnectInput = ({ chainId, address, loadWalletConnectData, mainnetPr
       setParsedTransactionData(parsedTransactionData);
       setIsModalVisible(true);
     } catch (error) {
-      console.log("am I here", error);
+
       setParsedTransactionData(null);
     }
   };
