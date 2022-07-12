@@ -108,13 +108,13 @@ const WalletConnectInput =
           onOk:async ()=>{
             let result;
             console.log("payload", payload);
-            console.log("userProvider", userProvider);
 
-            let params = payload.params[0];
 
-            result = await userSigner.signMessage(params);
+            //let params = payload.params[0];
 
-            console.log("RESULT:",result, userSigner)
+            result = await userProvider.send(payload.method, payload.args);
+
+            console.log("RESULT:",result)
 
             connector.approveRequest({
               id: payload.id,

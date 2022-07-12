@@ -35,7 +35,7 @@ import externalContracts from "./contracts/external_contracts";
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
 import { Home, Hints, Subgraph, OwnerManager, History } from "./views";
-import { useStaticJsonRPC, useLocalStorage } from "./hooks";
+import { useStaticJsonRPC, useLocalStorage, useUserProvider } from "./hooks";
 
 import Multisig from "./contracts/Multisig.json";
 
@@ -115,7 +115,7 @@ console.log("targetNetwork", targetNetwork, "backend",BACKEND_URL);
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider, USE_BURNER_WALLET);
   const userSigner = userProviderAndSigner.signer;
-  const userProvider = userProviderAndSigner.provider;
+  const userProvider = useUserProvider(injectedProvider, localProvider);
   console.log("userprovider", userProvider);
   console.log("userSigner", userSigner);
 
