@@ -112,9 +112,9 @@ const WalletConnectInput =
 
             let params = payload.params[0];
 
-            result = await userSigner.signMessage(payload.method, payload.params);
+            result = await userSigner.signMessage(params);
 
-            console.log("RESULT:",result)
+            console.log("RESULT:",result, userSigner)
 
             connector.approveRequest({
               id: payload.id,
